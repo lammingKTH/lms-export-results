@@ -1,6 +1,5 @@
 'use strict'
 const server = require('kth-node-server')
-const path = require('path')
 // Load .env file in development mode
 const nodeEnv = process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase()
 if (nodeEnv === 'development' || nodeEnv === 'dev' || !nodeEnv) {
@@ -14,12 +13,12 @@ if (nodeEnv === 'development' || nodeEnv === 'dev' || !nodeEnv) {
 // Now read the server config etc.
 const config = require('./configuration').server
 const AppRouter = require('kth-node-express-routing').PageRouter
-const getPaths = require('kth-node-express-routing').getPaths
+// const getPaths = require('kth-node-express-routing').getPaths
 
 // Expose the server and paths
-server.locals.secret = new Map()
+// server.locals.secret = new Map()
 module.exports = server
-module.exports.getPaths = () => getPaths()
+// module.exports.getPaths = () => getPaths()
 
 /* ***********************
  * ******* LOGGING *******
@@ -38,15 +37,6 @@ let logConfiguration = {
   src: config.logging.src
 }
 log.init(logConfiguration)
-
-/* **************************
- * ******* TEMPLATING *******
- * **************************
- */
-const exphbs = require('express-handlebars')
-server.set('views', path.join(__dirname, '/views'))
-server.engine('handlebars', exphbs())
-server.set('view engine', 'handlebars')
 
 /* ******************************
  * ******* ACCESS LOGGING *******
@@ -69,29 +59,12 @@ server.use(bodyParser.json())
 server.use(bodyParser.urlencoded({ extended: true }))
 server.use(cookieParser())
 
-/* ******************************
- * ******* AUTHENTICATION *******
- * ******************************
- */
-const passport = require('passport')
-require('./authentication')
-server.use(passport.initialize())
-server.use(passport.session())
-
-/* ************************
- * ******* DATABASE *******
- * ************************
- */
-// Just connect the database
-require('./database').connect()
-
 /* **********************************
  * ******* APPLICATION ROUTES *******
  * **********************************
  */
-const addPaths = require('kth-node-express-routing').addPaths
-const { createApiPaths, createSwaggerRedirectHandler, notFoundHandler, errorHandler } = require('kth-node-api-common')
-const swaggerData = require('../swagger.json')
+// const addPaths = require('kth-node-express-routing').addPaths
+const { notFoundHandler, errorHandler } = require('kth-node-api-common')
 const { System } = require('./controllers')
 
 // System pages routes
@@ -100,37 +73,9 @@ systemRoute.get('system.monitor', config.proxyPrefixPath.uri + '/_monitor', Syst
 systemRoute.get('system.about', config.proxyPrefixPath.uri + '/_about', System.about)
 systemRoute.get('system.paths', config.proxyPrefixPath.uri + '/_paths', System.paths)
 systemRoute.get('system.robots', '/robots.txt', System.robotsTxt)
-systemRoute.get('system.swagger', config.proxyPrefixPath.uri + '/swagger.json', System.swagger)
 server.use('/', systemRoute.getRouter())
 
-// Swagger UI
-const express = require('express')
-const swaggerUrl = config.proxyPrefixPath.uri + '/swagger'
-const redirectUrl = `${swaggerUrl}?url=${getPaths().system.swagger.uri}`
-server.use(swaggerUrl, createSwaggerRedirectHandler(redirectUrl, config.proxyPrefixPath.uri))
-server.use(swaggerUrl, express.static(path.join(__dirname, '../node_modules/swagger-ui/dist')))
-
-// Add API endpoints defined in swagger to path definitions so we can use them to register API enpoint handlers
-addPaths('api', createApiPaths({
-  swagger: swaggerData,
-  proxyPrefixPathUri: config.proxyPrefixPath.uri
-}))
-
-// Application specific API enpoints
-const { Sample } = require('./controllers')
-const ApiRouter = require('kth-node-express-routing').ApiRouter
-const apiRoute = ApiRouter()
-const paths = getPaths()
-
-// Middleware to protect enpoints with apiKey
-const authByApiKey = passport.authenticate('apikey', { session: false })
-
-// Api enpoints
-apiRoute.register(paths.api.checkAPIkey, authByApiKey, System.checkAPIKey)
-
-apiRoute.register(paths.api.getDataById, authByApiKey, Sample.getData)
-apiRoute.register(paths.api.postDataById, authByApiKey, Sample.postData)
-server.use('/', apiRoute.getRouter())
+// const express = require('express')
 
 // Catch not found and errors
 server.use(notFoundHandler)

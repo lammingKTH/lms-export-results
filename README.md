@@ -3,6 +3,11 @@
 Export results (betygsunderlag) from canvas to something that can be
 used for Ladok import (first attempt).
 
+### Node version
+
+This project uses node version 8.
+
+    nvm install 8
 
 #### Common errors
 
