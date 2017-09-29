@@ -21,6 +21,18 @@ return binding.open(pathModule._makeLong(path), stringToFlags(flags), mode);
 ```
 This is because the SSL information is incorrect in localSettings.js. Set ```useSsl: false``` to avoid this.
 
+### Setup canvas
+
+   curl -X POST 'https://kth.test.instructure.com/api/v1/accounts/1/external_tools' \
+     -H "Authorization: Bearer $CANVAS_TOKEN" \
+     -F 'name=Exportera resultat' \
+     -F 'consumer_key=asdfg' \
+     -F 'shared_secret=lkjh' \
+     -F 'url=http://kashyyyk.ite.kth.se:3001/api/node/post' \
+     -F 'privacy_level=public' \
+     -F 'course_navigation[text]=Exportera resultat' \
+     -F 'course_navigation[default]=false' \
+     -F 'course_navigation[enabled]=true'
 
 #### Testing
 
