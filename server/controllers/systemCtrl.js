@@ -34,7 +34,7 @@ function getSwagger (req, res) {
 function getAbout (req, res) {
   const paths = getPaths()
   res.status(200).send(
-	`<doctype html>
+    `<doctype html>
 <html><head><title>${packageFile.name} ${packageFile.version}</title></head>
 <body><h1>${packageFile.name} ${packageFile.version}</h1>
 <p>${packageFile.description}</p>

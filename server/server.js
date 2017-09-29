@@ -65,7 +65,7 @@ server.use(cookieParser())
  */
 // const addPaths = require('kth-node-express-routing').addPaths
 const { notFoundHandler, errorHandler } = require('kth-node-api-common')
-const { System } = require('./controllers')
+const { System, exportResults } = require('./controllers')
 
 // System pages routes
 const systemRoute = AppRouter()
@@ -73,7 +73,9 @@ systemRoute.get('system.monitor', config.proxyPrefixPath.uri + '/_monitor', Syst
 systemRoute.get('system.about', config.proxyPrefixPath.uri + '/_about', System.about)
 systemRoute.get('system.paths', config.proxyPrefixPath.uri + '/_paths', System.paths)
 systemRoute.get('system.robots', '/robots.txt', System.robotsTxt)
+
 server.use('/', systemRoute.getRouter())
+server.all(config.proxyPrefixPath.uri + '/post', exportResults)
 
 // const express = require('express')
 
