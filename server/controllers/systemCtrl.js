@@ -3,7 +3,6 @@
 const packageFile = require('../../package.json')
 const getPaths = require('kth-node-express-routing').getPaths
 
-const Promise = require('bluebird')
 const registry = require('component-registry').globalRegistry
 const { IHealthCheck } = require('kth-node-monitor').interfaces
 
@@ -34,13 +33,14 @@ function getSwagger (req, res) {
  */
 function getAbout (req, res) {
   const paths = getPaths()
-  res.render('system/about', {
-    appName: packageFile.name,
-    appVersion: packageFile.version,
-    appDescription: packageFile.description,
-    monitorUri: paths.system.monitor.uri,
-    robotsUri: paths.system.robots.uri
-  })
+  res.status(200).send(
+	`<doctype html>
+<html><head><title>${packageFile.name} ${packageFile.version}</title></head>
+<body><h1>${packageFile.name} ${packageFile.version}</h1>
+<p>${packageFile.description}</p>
+<p><a href="${paths.system.monitor.uri}">system status</a></p>
+</body></html>
+`)
 }
 
 /**

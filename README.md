@@ -8,6 +8,10 @@ used for Ladok import (first attempt).
 This project uses node version 8.
 
     nvm install 8
+    npm install
+    npm run dev-server
+
+http://localhost:3001/api/node/_about
 
 #### Common errors
 
