@@ -27,12 +27,12 @@ This is because the SSL information is incorrect in localSettings.js. Set ```use
 NAME="Exportera resultat $USER"
 curl -X POST 'https://kth.test.instructure.com/api/v1/accounts/1/external_tools' \
      -H "Authorization: Bearer $CANVAS_TOKEN" \
-     -F 'name=$NAME' \
+     -F "name=$NAME" \
      -F 'consumer_key=asdfg' \
      -F 'shared_secret=lkjh' \
-     -F 'url=http://$HOSTNAME:3001/api/lms-export-results/post' \
+     -F "url=http://$HOSTNAME:3001/api/lms-export-results/post" \
      -F 'privacy_level=public' \
-     -F 'course_navigation[text]=$NAME' \
+     -F "course_navigation[text]=$NAME" \
      -F 'course_navigation[default]=false' \
      -F 'course_navigation[enabled]=true'
 ```
