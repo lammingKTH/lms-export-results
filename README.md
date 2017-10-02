@@ -9,7 +9,7 @@ This project uses node version 8.
 
     nvm install 8
     npm install
-    npm run dev-server
+    npm run start-dev
 
 http://localhost:3001/api/node/_about
 
