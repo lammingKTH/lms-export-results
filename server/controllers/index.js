@@ -1,7 +1,9 @@
 'use strict'
 const querystring = require('querystring')
+const rp = require('request-promise')
 const settings = require('../configuration').server
 const local = require('../../config/localSettings')
+const CanvasApi = require('kth-canvas-api')
 
 function exportResults (req, res) {
   let b = req.body
@@ -15,12 +17,49 @@ function exportResults (req, res) {
   res.redirect(basicUrl)
 }
 
-function exportResults2 (req, res) {
+async function exportResults2 (req, res) {
   let courseRound = req.query.courseRound
   const canvasCourseId = req.query.canvasCourseId
-  console.log(`Shoule export for ${courseRound} / ${canvasCourseId}`)
-  res.attachment(`${courseRound}-results.csv`)
-  res.status(200).send('namn,pnr\nkalle,7207xy')
+  console.log(`Should export for ${courseRound} / ${canvasCourseId}`)
+  try {
+    const auth = await rp({
+      method: 'POST',
+      uri: `https://${settings.canvas_host}/login/oauth2/token`,
+      body: {
+        grant_type: 'authorization_code',
+        client_id: local.client_id,
+        client_secret: local.client_secret,
+        redirect_uri: req.protocol + '://' + req.get('host') + req.originalUrl,
+        code: req.query.code
+      },
+      json: true
+    })
+    console.log(auth)
+    const canvasApi = new CanvasApi(`https://${settings.canvas_host}/api/v1`, auth.access_token)
+    const foo = await canvasApi.requestCanvas(`courses/${canvasCourseId}/assignments`)
+    console.log('=======================================================================')
+    for (let t of foo) {
+      // console.log(t)
+      console.log(`${t.id} is "${t.name}"`)
+    }
+    console.log('-----------------------------------------------------------------------')
+    const data = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
+    for (let student of data) {
+      let row = {
+        kthid: student.sis_user_id
+      }
+      for (let submission of student.submissions) {
+        row['' + submission.assignment_id] = `${submission.workflow_state} ${submission.entered_grade}`
+      }
+      console.log(row)
+    }
+    console.log('-----------------------------------------------------------------------')
+    // res.attachment(`${courseRound}-results.csv`)
+    res.status(200).send('namn,pnr\nkalle,7207xy')
+  } catch (e) {
+    console.log(e)
+    res.status(500).send('Trasigt')
+  }
 }
 
 module.exports = {

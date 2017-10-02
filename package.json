@@ -22,6 +22,8 @@
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
     "express": "^4.14.0",
+    "kth-canvas-api": "^0.11.0",
+    "kth-canvas-utilities": "github:kth/kth-canvas-utilities",
     "kth-node-access-log": "KTH/kth-node-access-log.git#v1.0.0",
     "kth-node-api-common": "^0.1.3",
     "kth-node-api-key-strategy": "^1.0.5",
@@ -31,6 +33,8 @@
     "kth-node-monitor": "^0.1.5",
     "kth-node-response": "KTH/kth-node-response.git#v1.0.0",
     "kth-node-server": "^3.0.3",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
     "safe-utils": "0.1.0"
   },
   "devDependencies": {
