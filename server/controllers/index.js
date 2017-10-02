@@ -38,10 +38,16 @@ async function exportResults2 (req, res) {
     const canvasApi = new CanvasApi(`https://${settings.canvas_host}/api/v1`, auth.access_token)
     const foo = await canvasApi.requestCanvas(`courses/${canvasCourseId}/assignments`)
     console.log('=======================================================================')
+    const assignmentIds = []
+    const headers = {}
     for (let t of foo) {
-      // console.log(t)
-      console.log(`${t.id} is "${t.name}"`)
+      const id = '' + t.id
+      assignmentIds.push(id)
+      headers[id] = t.name
+      // console.log(`${t.id} is "${t.name}"`)
     }
+    console.log('-----------------------------------------------------------------------')
+    console.log(['kthid'].concat(assignmentIds.map(function (id) { return headers[id] })))
     console.log('-----------------------------------------------------------------------')
     const data = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
     for (let student of data) {
@@ -51,7 +57,7 @@ async function exportResults2 (req, res) {
       for (let submission of student.submissions) {
         row['' + submission.assignment_id] = `${submission.workflow_state} ${submission.entered_grade}`
       }
-      console.log(row)
+      console.log([student.sis_user_id].concat(assignmentIds.map(function (id) { return row[id] })))
     }
     console.log('-----------------------------------------------------------------------')
     // res.attachment(`${courseRound}-results.csv`)
