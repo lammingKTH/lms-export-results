@@ -7,7 +7,7 @@ const CanvasApi = require('kth-canvas-api')
 
 function exportResults (req, res) {
   let b = req.body
-  console.log(b)
+  // console.log(b)
   let courseRound = b.lis_course_offering_sourcedid
   const canvasCourseId = b.custom_canvas_course_id
   const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
