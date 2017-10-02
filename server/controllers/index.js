@@ -4,6 +4,7 @@ const rp = require('request-promise')
 const settings = require('../configuration').server
 const local = require('../../config/localSettings')
 const CanvasApi = require('kth-canvas-api')
+const csv = require('./csvFile')
 
 function exportResults (req, res) {
   let b = req.body
@@ -47,9 +48,16 @@ async function exportResults2 (req, res) {
       // console.log(`${t.id} is "${t.name}"`)
     }
     console.log('-----------------------------------------------------------------------')
-    console.log(['kthid'].concat(assignmentIds.map(function (id) { return headers[id] })))
+    const csvHeader = ['kthid'].concat(assignmentIds.map(function (id) { return headers[id] }))
+    console.log(csvHeader)
     console.log('-----------------------------------------------------------------------')
     const data = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
+    // So far so good, start constructing the output
+    res.status(200)
+    res.contentType('csv')
+    res.attachment(`${courseRound || 'canvas'}-results.csv`)
+    res.write(csv.createLine(csvHeader))
+
     for (let student of data) {
       let row = {
         kthid: student.sis_user_id
@@ -57,11 +65,12 @@ async function exportResults2 (req, res) {
       for (let submission of student.submissions) {
         row['' + submission.assignment_id] = `${submission.workflow_state} ${submission.entered_grade}`
       }
-      console.log([student.sis_user_id].concat(assignmentIds.map(function (id) { return row[id] })))
+      const csvLine = [student.sis_user_id || student.id].concat(assignmentIds.map(function (id) { return row[id] || '-' }))
+      console.log(csvLine)
+      res.write(csv.createLine(csvLine))
     }
     console.log('-----------------------------------------------------------------------')
-    // res.attachment(`${courseRound}-results.csv`)
-    res.status(200).send('namn,pnr\nkalle,7207xy')
+    res.send()
   } catch (e) {
     console.log(e)
     res.status(500).send('Trasigt')
