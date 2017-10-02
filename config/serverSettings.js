@@ -46,7 +46,8 @@ module.exports = {
     log: {
       level: getEnv('LOGGING_LEVEL', 'debug')
     }
-  }
+  },
 
   // Custom app settings
+  canvas_host: 'kth.test.instructure.com'
 }
