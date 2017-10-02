@@ -25,12 +25,5 @@ elif [ "$1" = "ref" ] ; then
   NODE_ENV=referens node app.js > $SYSTEM_LOG 2>&1 &
     echo $! > $PIDFILE
 else
-    SERVICE=mongod
-    MONGO_LOG_FILE=mongod.log
-    MONGO_LOG="$LOG_DIR/$MONGO_LOG_FILE"
-
-    echo "Starting MongoDB. Logging to $MONGO_LOG"
-    $SERVICE --fork --logpath $MONGO_LOG
-
     npm run installAndStart
 fi
