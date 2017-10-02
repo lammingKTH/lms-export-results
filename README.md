@@ -11,7 +11,7 @@ This project uses node version 8.
     npm install
     npm run start-dev
 
-http://localhost:3001/api/node/_about
+http://localhost:3001/api/lms-export-results/_about
 
 #### Common errors
 
