@@ -78,7 +78,6 @@ server.use('/', systemRoute.getRouter())
 server.all(config.proxyPrefixPath.uri + '/post', exportResults)
 server.all(config.proxyPrefixPath.uri + '/post2', exportResults2)
 
-
 // const express = require('express')
 
 // Catch not found and errors

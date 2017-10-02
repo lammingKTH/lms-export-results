@@ -7,20 +7,19 @@
  * *************************************************
  *
  */
-const { getEnv, unpackMongodbConfig } = require('kth-node-configuration')
+const { getEnv } = require('kth-node-configuration')
 // const { safeGet } = require('safe-utils')
 
 // DEFAULT SETTINGS used for dev, if you want to override these for you local environment, use env-vars in .env
-const devPrefixPath = '/api/node'
+const prefixPath = '/api/lms-export-results'
 const devSsl = false
 const devPort = 3001
-const devMongodb = 'mongodb://localhost:27017/node'
 // END DEFAULT SETTINGS
 
 module.exports = {
   // The proxy prefix path if the application is proxied. E.g /places
   proxyPrefixPath: {
-    uri: getEnv('SERVICE_PUBLISH', devPrefixPath)
+    uri: getEnv('SERVICE_PUBLISH', prefixPath)
   },
   useSsl: getEnv('SERVER_SSL', devSsl + '').toLowerCase() === 'true',
   port: getEnv('SERVER_PORT', devPort),
@@ -37,9 +36,6 @@ module.exports = {
     apikey: getEnv('NODE_API_KEY', '1234'),
     scope: ['write', 'read']
   }],
-
-  // Services
-  db: unpackMongodbConfig('MONGODB_URI', devMongodb),
 
   // Logging
   logging: {
