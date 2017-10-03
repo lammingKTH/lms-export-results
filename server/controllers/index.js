@@ -51,7 +51,7 @@ async function exportResults2 (req, res) {
       assignmentIds.push(id)
       headers[id] = `${t.name} (${t.id})`
     }
-    const csvHeader = ['SIS User ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(function (id) { return headers[id] }))
+    const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(function (id) { return headers[id] }))
     const students = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
     // So far so good, start constructing the output
     res.status(200)
@@ -88,7 +88,7 @@ async function exportResults2 (req, res) {
       for (let submission of student.submissions) {
         row[ '' + submission.assignment_id ] = submission.entered_grade || ''
       }
-      const csvLine = [student.sis_user_id || student.id, row['givenName'] || '', row['surname'] || '', row['personnummer'] || ''].concat(assignmentIds.map(function (id) { return row[id] || '-' }))
+      const csvLine = [student.sis_user_id || '', student.user_id || '', row['givenName'] || '', row['surname'] || '', row['personnummer'] || ''].concat(assignmentIds.map(function (id) { return row[id] || '-' }))
       // console.log(csvLine)
       res.write(csv.createLine(csvLine))
     }
