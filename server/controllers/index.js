@@ -5,6 +5,13 @@ const settings = require('../configuration').server
 const local = require('../../config/localSettings')
 const CanvasApi = require('kth-canvas-api')
 const csv = require('./csvFile')
+const ldap = require('ldapjs')
+const Promise = require('bluebird')
+
+const ldapClient = Promise.promisifyAll(ldap.createClient({
+  url: local.ugUrl
+}))
+
 
 function exportResults (req, res) {
   let b = req.body
@@ -18,7 +25,8 @@ function exportResults (req, res) {
   res.redirect(basicUrl)
 }
 
-async function exportResults2 (req, res) {
+async function exportResults2 (req, res) { 
+  await ldapClient.bindAsync(local.ugUsername, local.ugPwd)
   let courseRound = req.query.courseRound
   const canvasCourseId = req.query.canvasCourseId
   console.log(`Should export for ${courseRound} / ${canvasCourseId}`)
@@ -35,11 +43,11 @@ async function exportResults2 (req, res) {
       },
       json: true
     })
-    console.log(auth)
+    // console.log(auth)
     const canvasApi = new CanvasApi(`https://${settings.canvas_host}/api/v1`, auth.access_token)
     const assignments = await canvasApi.requestCanvas(`courses/${canvasCourseId}/assignments`)
     console.log('=======================================================================')
-    console.log(assignments)
+    // console.log(assignments)
     const assignmentIds = []
     const headers = {}
     for (let t of assignments) {
@@ -50,28 +58,50 @@ async function exportResults2 (req, res) {
     }
     console.log('-----------------------------------------------------------------------')
     const csvHeader = ['SIS User ID'].concat(assignmentIds.map(function (id) { return headers[id] }))
-    console.log(csvHeader)
+    // console.log(csvHeader)
     console.log('-----------------------------------------------------------------------')
-    const data = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
+    const students = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
     // So far so good, start constructing the output
     res.status(200)
     res.contentType('csv')
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
     res.write(csv.createLine(csvHeader))
 
-    for (let student of data) {
+    for (let student of students) {
+      console.log(`(distinguishedName=${student.sis_user_id})`)
+      const ldapResults = await ldapClient.searchAsync('OU=UG,DC=ug,DC=kth,DC=se', {
+        scope: 'sub',
+        filter: `(ugKthid=${student.sis_user_id})`,
+        timeLimit: 10,
+        paging: true,
+        // attributes,
+        paged: {
+          pageSize: 1000,
+          pagePause: false
+        }
+      })
+      const ugUser = await new Promise((resolve,reject) => {
+        const user = []
+        ldapResults.on('searchEntry', ({object}) => user.push(object))
+        ldapResults.on('end', () => resolve(user))
+        ldapResults.on('error', reject)
+      })
+      console.log('ugUser::::::',ugUser)
+
       let row = {
-        kthid: student.sis_user_id
+        kthid: student.sis_user_id,
+        personnummer:''
       }
       for (let submission of student.submissions) {
         row['' + submission.assignment_id] = submission.entered_grade || ''
       }
       const csvLine = [student.sis_user_id || student.id].concat(assignmentIds.map(function (id) { return row[id] || '-' }))
-      console.log(csvLine)
+      // console.log(csvLine)
       res.write(csv.createLine(csvLine))
     }
     console.log('-----------------------------------------------------------------------')
     res.send()
+
   } catch (e) {
     console.log(e)
     res.status(500).send('Trasigt')
