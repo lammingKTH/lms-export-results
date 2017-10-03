@@ -1,4 +1,4 @@
-FROM kthse/kth-nodejs-api:2.3
+FROM node:8.1-wheezy
 
 MAINTAINER KTH Webb "cortina.developers@kth.se"
 
