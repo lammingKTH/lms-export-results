@@ -1,7 +1,7 @@
 #!/bin/bash
 
 LOG_DIR=logs
-PROJECT=node-api
+PROJECT=lms-export-results
 
 if [ "$1" = "ref" ] ; then
   LOG_DIR=/var/log/$PROJECT
