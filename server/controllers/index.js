@@ -37,14 +37,15 @@ async function exportResults2 (req, res) {
     })
     console.log(auth)
     const canvasApi = new CanvasApi(`https://${settings.canvas_host}/api/v1`, auth.access_token)
-    const foo = await canvasApi.requestCanvas(`courses/${canvasCourseId}/assignments`)
+    const assignments = await canvasApi.requestCanvas(`courses/${canvasCourseId}/assignments`)
     console.log('=======================================================================')
+    console.log(assignments)
     const assignmentIds = []
     const headers = {}
-    for (let t of foo) {
+    for (let t of assignments) {
       const id = '' + t.id
       assignmentIds.push(id)
-      headers[id] = t.name
+      headers[id] = `${t.name} (${t.id})`
       // console.log(`${t.id} is "${t.name}"`)
     }
     console.log('-----------------------------------------------------------------------')
