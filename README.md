@@ -13,13 +13,15 @@ This project uses node version 8.
 
 http://localhost:3001/api/lms-export-results/_about
 
-#### Common errors
+#### Configuration
 
-When trying to run node-api as a standalone you might encounter the following error:
-```
-return binding.open(pathModule._makeLong(path), stringToFlags(flags), mode);
-```
-This is because the SSL information is incorrect in localSettings.js. Set ```useSsl: false``` to avoid this.
+The following settings are needed, either in a .env or in the process
+environment:
+CANVAS_CLIENT_ID
+CANVAS_CLIENT_SECRET
+LDAP_URL
+LDAP_USERNAME
+LDAP_PASSWORD
 
 ### Setup canvas
 

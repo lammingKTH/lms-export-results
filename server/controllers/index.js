@@ -2,14 +2,13 @@
 const querystring = require('querystring')
 const rp = require('request-promise')
 const settings = require('../configuration').server
-const local = require('../../config/localSettings')
 const CanvasApi = require('kth-canvas-api')
 const csv = require('./csvFile')
 const ldap = require('ldapjs')
 const Promise = require('bluebird')
 
 const ldapClient = Promise.promisifyAll(ldap.createClient({
-  url: local.ugUrl
+  url: process.env.LDAP_URL
 }))
 
 function exportResults (req, res) {
@@ -20,7 +19,7 @@ function exportResults (req, res) {
   const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
   const nextUrl = fullUrl + '2?' + querystring.stringify({courseRound, canvasCourseId})
   console.log(nextUrl)
-  const basicUrl = `https://${settings.canvas_host}/login/oauth2/auth?` + querystring.stringify({client_id: local.client_id, response_type: 'code', redirect_uri: nextUrl})
+  const basicUrl = `https://${settings.canvas_host}/login/oauth2/auth?` + querystring.stringify({client_id: process.env.CANVAS_CLIENT_ID, response_type: 'code', redirect_uri: nextUrl})
   res.redirect(basicUrl)
 }
 
@@ -29,14 +28,14 @@ async function exportResults2 (req, res) {
   const canvasCourseId = req.query.canvasCourseId
   console.log(`Should export for ${courseRound} / ${canvasCourseId}`)
   try {
-    await ldapClient.bindAsync(local.ugUsername, local.ugPwd)
+    await ldapClient.bindAsync(process.env.LDAP_USERNAME, process.env.LDAP_PASSWORD)
     const auth = await rp({
       method: 'POST',
       uri: `https://${settings.canvas_host}/login/oauth2/token`,
       body: {
         grant_type: 'authorization_code',
-        client_id: local.client_id,
-        client_secret: local.client_secret,
+        client_id: process.env.CANVAS_CLIENT_ID,
+        client_secret: process.env.CANVAS_CLIENT_SECRET,
         redirect_uri: req.protocol + '://' + req.get('host') + req.originalUrl,
         code: req.query.code
       },
