@@ -86,7 +86,7 @@ async function exportResults2 (req, res) {
         row['personnummer'] = ugUser[0].norEduPersonNIN
       }
       for (let submission of student.submissions) {
-        row[ '' + submission.assignment_id ] = submission.entered_grade || ''
+        row['' + submission.assignment_id] = submission.entered_grade || ''
       }
       const csvLine = [student.sis_user_id || '', student.user_id || '', row['givenName'] || '', row['surname'] || '', row['personnummer'] || ''].concat(assignmentIds.map(function (id) { return row[id] || '-' }))
       // console.log(csvLine)
