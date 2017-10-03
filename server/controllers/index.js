@@ -49,7 +49,7 @@ async function exportResults2 (req, res) {
       // console.log(`${t.id} is "${t.name}"`)
     }
     console.log('-----------------------------------------------------------------------')
-    const csvHeader = ['kthid'].concat(assignmentIds.map(function (id) { return headers[id] }))
+    const csvHeader = ['SIS User ID'].concat(assignmentIds.map(function (id) { return headers[id] }))
     console.log(csvHeader)
     console.log('-----------------------------------------------------------------------')
     const data = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
@@ -64,7 +64,7 @@ async function exportResults2 (req, res) {
         kthid: student.sis_user_id
       }
       for (let submission of student.submissions) {
-        row['' + submission.assignment_id] = `${submission.workflow_state} ${submission.entered_grade}`
+        row['' + submission.assignment_id] = submission.entered_grade || ''
       }
       const csvLine = [student.sis_user_id || student.id].concat(assignmentIds.map(function (id) { return row[id] || '-' }))
       console.log(csvLine)
