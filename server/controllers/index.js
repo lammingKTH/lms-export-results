@@ -26,11 +26,11 @@ function exportResults (req, res) {
 }
 
 async function exportResults2 (req, res) { 
-  await ldapClient.bindAsync(local.ugUsername, local.ugPwd)
   let courseRound = req.query.courseRound
   const canvasCourseId = req.query.canvasCourseId
   console.log(`Should export for ${courseRound} / ${canvasCourseId}`)
   try {
+    await ldapClient.bindAsync(local.ugUsername, local.ugPwd)    
     const auth = await rp({
       method: 'POST',
       uri: `https://${settings.canvas_host}/login/oauth2/token`,
@@ -57,7 +57,7 @@ async function exportResults2 (req, res) {
       // console.log(`${t.id} is "${t.name}"`)
     }
     console.log('-----------------------------------------------------------------------')
-    const csvHeader = ['SIS User ID'].concat(assignmentIds.map(function (id) { return headers[id] }))
+    const csvHeader = ['SIS User ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(function (id) { return headers[id] }))
     // console.log(csvHeader)
     console.log('-----------------------------------------------------------------------')
     const students = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
@@ -66,15 +66,16 @@ async function exportResults2 (req, res) {
     res.contentType('csv')
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
     res.write(csv.createLine(csvHeader))
-
+    
+    const attributes = ['givenName', 'sn', 'norEduPersonNIN']
+    
     for (let student of students) {
-      console.log(`(distinguishedName=${student.sis_user_id})`)
-      const ldapResults = await ldapClient.searchAsync('OU=UG,DC=ug,DC=kth,DC=se', {
+      const ldapResults = await ldapClient.searchAsync('ou=UG,dc=referens,dc=sys,dc=kth,dc=se', {
         scope: 'sub',
-        filter: `(ugKthid=${student.sis_user_id})`,
+        filter: `(ugKthId=${student.sis_user_id})`,
         timeLimit: 10,
         paging: true,
-        // attributes,
+        attributes,
         paged: {
           pageSize: 1000,
           pagePause: false
@@ -90,12 +91,16 @@ async function exportResults2 (req, res) {
 
       let row = {
         kthid: student.sis_user_id,
-        personnummer:''
+      }
+      if (ugUser.length > 0) {
+        row['givenName'] = ugUser[0].givenName,
+        row['surname'] = ugUser[0].sn,
+        row['personnummer'] = ugUser[0].norEduPersonNIN
       }
       for (let submission of student.submissions) {
         row['' + submission.assignment_id] = submission.entered_grade || ''
       }
-      const csvLine = [student.sis_user_id || student.id].concat(assignmentIds.map(function (id) { return row[id] || '-' }))
+      const csvLine = [student.sis_user_id || student.id, row['givenName'] || '', row['surname'] || '', row['personnummer'] || ''].concat(assignmentIds.map(function (id) { return row[id] || '-' }))
       // console.log(csvLine)
       res.write(csv.createLine(csvLine))
     }
