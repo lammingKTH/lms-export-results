@@ -8,7 +8,7 @@ const ldap = require('ldapjs')
 const Promise = require('bluebird')
 
 const ldapClient = Promise.promisifyAll(ldap.createClient({
-  url: process.env.LDAP_URL
+  url: process.env.LDAP_URL || 'ldaps://ldap.kth.se'
 }))
 
 function exportResults (req, res) {
