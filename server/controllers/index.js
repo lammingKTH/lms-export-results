@@ -7,10 +7,6 @@ const csv = require('./csvFile')
 const ldap = require('ldapjs')
 const Promise = require('bluebird')
 
-const ldapClient = Promise.promisifyAll(ldap.createClient({
-  url: process.env.LDAP_URL || 'ldaps://ldap.kth.se'
-}))
-
 function exportResults (req, res) {
   let b = req.body
   // console.log(b)
@@ -28,6 +24,9 @@ async function exportResults2 (req, res) {
   const canvasCourseId = req.query.canvasCourseId
   console.log(`Should export for ${courseRound} / ${canvasCourseId}`)
   try {
+    const ldapClient = Promise.promisifyAll(ldap.createClient({
+      url: process.env.LDAP_URL || 'ldaps://ldap.kth.se'
+    }))
     await ldapClient.bindAsync(process.env.LDAP_USERNAME, process.env.LDAP_PASSWORD)
     const auth = await rp({
       method: 'POST',
