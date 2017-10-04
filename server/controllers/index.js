@@ -11,7 +11,7 @@ function exportResults (req, res) {
   // console.log(b)
   let courseRound = b.lis_course_offering_sourcedid
   const canvasCourseId = b.custom_canvas_course_id
-  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
+  const fullUrl = (process.env.PROXY_BASE || (req.protocol + '://' + req.get('host'))) + req.originalUrl
   const nextUrl = fullUrl + '2?' + querystring.stringify({courseRound, canvasCourseId})
   console.log(nextUrl)
   const basicUrl = `https://${settings.canvas_host}/login/oauth2/auth?` + querystring.stringify({client_id: process.env.CANVAS_CLIENT_ID, response_type: 'code', redirect_uri: nextUrl})
