@@ -1,3 +1,4 @@
+const log = require('kth-node-log')
 const Promise = require('bluebird')
 const ldap = require('ldapjs')
 
@@ -7,11 +8,11 @@ async function getBoundClient () {
     timeout: 1000,
     connectTimeout: 1000
   }
-  console.log('Should get ldap client for', options)
+  log.info('Should get ldap client for', options)
   const ldapClient = Promise.promisifyAll(ldap.createClient(options))
-  console.log('Should bind to ldap')
+  log.info('Should bind to ldap')
   await ldapClient.bindAsync(process.env.LDAP_USERNAME, process.env.LDAP_PASSWORD)
-  console.log('returning ldap client')
+  log.info('returning ldap client')
   return ldapClient
 }
 

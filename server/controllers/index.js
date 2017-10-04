@@ -1,4 +1,5 @@
 'use strict'
+const log = require('kth-node-log')
 const querystring = require('querystring')
 const rp = require('request-promise')
 const settings = require('../configuration').server
@@ -13,7 +14,7 @@ function exportResults (req, res) {
   const canvasCourseId = b.custom_canvas_course_id
   const fullUrl = (process.env.PROXY_BASE || (req.protocol + '://' + req.get('host'))) + req.originalUrl
   const nextUrl = fullUrl + '2?' + querystring.stringify({courseRound, canvasCourseId})
-  console.log(nextUrl)
+  log.info('Tell auth to redirect back to', nextUrl)
   const basicUrl = `https://${settings.canvas_host}/login/oauth2/auth?` + querystring.stringify({client_id: process.env.CANVAS_CLIENT_ID, response_type: 'code', redirect_uri: nextUrl})
   res.redirect(basicUrl)
 }
@@ -21,7 +22,7 @@ function exportResults (req, res) {
 async function exportResults2 (req, res) {
   let courseRound = req.query.courseRound
   const canvasCourseId = req.query.canvasCourseId
-  console.log(`Should export for ${courseRound} / ${canvasCourseId}`)
+  log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
   try {
     const ldapClient = await ldap.getBoundClient()
     const auth = await rp({
@@ -69,7 +70,7 @@ async function exportResults2 (req, res) {
     }
     res.send()
   } catch (e) {
-    console.log(e)
+    log.error('Export failed:', e)
     res.status(500).send('Trasigt')
   }
 }

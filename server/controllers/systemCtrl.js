@@ -1,5 +1,6 @@
 'use strict'
 
+const log = require('kth-node-log')
 const packageFile = require('../../package.json')
 const getPaths = require('kth-node-express-routing').getPaths
 const settings = require('../configuration').server
@@ -67,7 +68,7 @@ async function getMonitor (req, res) {
       `APPLICATION_STATUS: ${globalStatus}
 LDAP: ${ldapStatus}`)
   } catch (err) {
-    console.log('Failed to display status page:', err)
+    log.error('Failed to display status page:', err)
     res.type('text').status(500).send('APPLICATION_STATUS ERROR')
   }
 }
