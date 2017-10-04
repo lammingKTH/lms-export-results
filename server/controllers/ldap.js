@@ -2,44 +2,60 @@ const log = require('kth-node-log')
 const Promise = require('bluebird')
 const ldap = require('ldapjs')
 
-async function getBoundClient () {
-  const options = {
-    url: process.env.LDAP_URL || 'ldaps://ldap.kth.se',
-    timeout: 1000,
-    connectTimeout: 1000
-  }
-  log.info('Should get ldap client for', options)
-  const ldapClient = Promise.promisifyAll(ldap.createClient(options))
-  log.info('Should bind to ldap')
-  await ldapClient.bindAsync(process.env.LDAP_USERNAME, process.env.LDAP_PASSWORD)
-  log.info('returning ldap client')
-  return ldapClient
+function getBoundClient () {
+  return new Promise((resolve, reject) => {
+    const options = {
+      url: process.env.LDAP_URL || 'ldaps://ldap.kth.se',
+      timeout: 1000,
+      connectTimeout: 1000,
+      log: log
+    }
+    log.info('Should get ldap client for', options)
+    const ldapClient = ldap.createClient(options)
+    ldapClient.on('error', function (e) {
+      log.error('In ldapClient on error:', e)
+      reject(e)
+    })
+    ldapClient.bind(process.env.LDAP_USERNAME, process.env.LDAP_PASSWORD, function (err) {
+      if (err) {
+        reject(err)
+      } else {
+        log.info('Created bound ldap client')
+        resolve(ldapClient)
+      }
+    })
+  })
 }
 
-async function lookupUser (ldapClient, kthid) {
-  const attributes = ['givenName', 'sn', 'norEduPersonNIN']
-  const ldapResults = await ldapClient.searchAsync('ou=UG,dc=referens,dc=sys,dc=kth,dc=se', {
-    scope: 'sub',
-    filter: `(ugKthId=${kthid})`,
-    timeLimit: 10,
-    paging: true,
-    attributes,
-    paged: {
-      pageSize: 1000,
-      pagePause: false
-    }
+function lookupUser (ldapClient, kthid) {
+  return new Promise((resolve, reject) => {
+    log.info('Should try to search')
+    ldapClient.search(
+      'ou=UG,dc=referens,dc=sys,dc=kth,dc=se',
+      {
+        scope: 'sub',
+        filter: `(ugKthId=${kthid})`,
+        timeLimit: 10,
+        paging: true,
+        attributes: ['givenName', 'sn', 'norEduPersonNIN'],
+        paged: {
+          pageSize: 1000,
+          pagePause: false
+        }
+      },
+      function (err, res) {
+        if (err) {
+          log.debug('God err from search:', err)
+          reject(err)
+        } else {
+          let user
+          res.on('searchEntry', ({object}) => { user = object })
+          res.on('end', () => resolve(user))
+          res.on('error', reject)
+        }
+      }
+    )
   })
-  const ugUser = await new Promise((resolve, reject) => {
-    const user = []
-    ldapResults.on('searchEntry', ({object}) => user.push(object))
-    ldapResults.on('end', () => resolve(user))
-    ldapResults.on('error', reject)
-  })
-  if (ugUser.length > 0) {
-    return ugUser[0]
-  } else {
-    return {}
-  }
 }
 
 module.exports = {
