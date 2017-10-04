@@ -37,7 +37,7 @@ function getAbout (req, res) {
   const splitver = packageFile.version.split('.')
   const fullVersion = `${splitver[0]}.${splitver[1]}.${version.jenkinsBuild}`
   res.status(200).send(
-    `<doctype html>
+    `<!doctype html>
 <html><head><title>${packageFile.name} ${fullVersion}</title></head>
 <body><h1>${packageFile.name} ${fullVersion}</h1>
 <p>${packageFile.description}</p>
@@ -69,7 +69,7 @@ async function getMonitor (req, res) {
 LDAP: ${ldapStatus}`)
   } catch (err) {
     log.error('Failed to display status page:', err)
-    res.type('text').status(500).send('APPLICATION_STATUS ERROR')
+    res.type('text').status(500).send('APPLICATION_STATUS ERROR\n')
   }
 }
 
