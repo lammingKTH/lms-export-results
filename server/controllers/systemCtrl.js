@@ -63,8 +63,8 @@ async function getMonitor (req, res) {
       `APPLICATION_STATUS: ${globalStatus}
 LDAP: ${ldapStatus}`)
   } catch (err) {
-    console.log(`Failed to display status page: ${err}`)
-    res.type('text').status(500).send(`Error: ${err}`)
+    console.log('Failed to display status page:', err)
+    res.type('text').status(500).send('APPLICATION_STATUS ERROR')
   }
 }
 
