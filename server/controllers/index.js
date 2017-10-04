@@ -19,6 +19,32 @@ function exportResults (req, res) {
   res.redirect(basicUrl)
 }
 
+async function lookupUserInLdap (ldapClient, kthid) {
+  const attributes = ['givenName', 'sn', 'norEduPersonNIN']
+  const ldapResults = await ldapClient.searchAsync('ou=UG,dc=referens,dc=sys,dc=kth,dc=se', {
+    scope: 'sub',
+    filter: `(ugKthId=${kthid})`,
+    timeLimit: 10,
+    paging: true,
+    attributes,
+    paged: {
+      pageSize: 1000,
+      pagePause: false
+    }
+  })
+  const ugUser = await new Promise((resolve, reject) => {
+    const user = []
+    ldapResults.on('searchEntry', ({object}) => user.push(object))
+    ldapResults.on('end', () => resolve(user))
+    ldapResults.on('error', reject)
+  })
+  if (ugUser.length > 0) {
+    return ugUser[0]
+  } else {
+    return {}
+  }
+}
+
 async function exportResults2 (req, res) {
   let courseRound = req.query.courseRound
   const canvasCourseId = req.query.canvasCourseId
@@ -56,32 +82,13 @@ async function exportResults2 (req, res) {
     res.contentType('csv')
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
     res.write(csv.createLine(csvHeader))
-    const attributes = ['givenName', 'sn', 'norEduPersonNIN']
     for (let student of students) {
-      const ldapResults = await ldapClient.searchAsync('ou=UG,dc=referens,dc=sys,dc=kth,dc=se', {
-        scope: 'sub',
-        filter: `(ugKthId=${student.sis_user_id})`,
-        timeLimit: 10,
-        paging: true,
-        attributes,
-        paged: {
-          pageSize: 1000,
-          pagePause: false
-        }
-      })
-      const ugUser = await new Promise((resolve, reject) => {
-        const user = []
-        ldapResults.on('searchEntry', ({object}) => user.push(object))
-        ldapResults.on('end', () => resolve(user))
-        ldapResults.on('error', reject)
-      })
+      const ugUser = await lookupUserInLdap(ldapClient, student.sis_user_id)
       let row = {
-        kthid: student.sis_user_id
-      }
-      if (ugUser.length > 0) {
-        row['givenName'] = ugUser[0].givenName
-        row['surname'] = ugUser[0].sn
-        row['personnummer'] = ugUser[0].norEduPersonNIN
+        kthid: student.sis_user_id,
+        givenName: ugUser.givenName,
+        surname: ugUser.sn,
+        personnummer: ugUser.norEduPersonNIN
       }
       for (let submission of student.submissions) {
         row['' + submission.assignment_id] = submission.entered_grade || ''
