@@ -5,7 +5,8 @@ async function getBoundClient () {
   const url = process.env.LDAP_URL || 'ldaps://ldap.kth.se'
   console.log('Should get ldap client connected to', url)
   const ldapClient = Promise.promisifyAll(ldap.createClient({
-    url: url
+    url: url,
+    connectTimeout: 1000
   }))
   await ldapClient.bindAsync(process.env.LDAP_USERNAME, process.env.LDAP_PASSWORD)
   return ldapClient
