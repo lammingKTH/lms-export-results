@@ -2,14 +2,16 @@ const Promise = require('bluebird')
 const ldap = require('ldapjs')
 
 async function getBoundClient () {
-  const url = process.env.LDAP_URL || 'ldaps://ldap.kth.se'
-  console.log('Should get ldap client connected to', url)
-  const ldapClient = Promise.promisifyAll(ldap.createClient({
-    url: url,
+  const options = {
+    url: process.env.LDAP_URL || 'ldaps://ldap.kth.se',
     timeout: 1000,
     connectTimeout: 1000
-  }))
+  }
+  console.log('Should get ldap client for', options)
+  const ldapClient = Promise.promisifyAll(ldap.createClient(options))
+  console.log('Should bind to ldap')
   await ldapClient.bindAsync(process.env.LDAP_USERNAME, process.env.LDAP_PASSWORD)
+  console.log('returning ldap client')
   return ldapClient
 }
 
