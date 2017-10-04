@@ -4,8 +4,7 @@ const rp = require('request-promise')
 const settings = require('../configuration').server
 const CanvasApi = require('kth-canvas-api')
 const csv = require('./csvFile')
-const ldap = require('ldapjs')
-const Promise = require('bluebird')
+const ldap = require('./ldap')
 
 function exportResults (req, res) {
   let b = req.body
@@ -19,41 +18,12 @@ function exportResults (req, res) {
   res.redirect(basicUrl)
 }
 
-async function lookupUserInLdap (ldapClient, kthid) {
-  const attributes = ['givenName', 'sn', 'norEduPersonNIN']
-  const ldapResults = await ldapClient.searchAsync('ou=UG,dc=referens,dc=sys,dc=kth,dc=se', {
-    scope: 'sub',
-    filter: `(ugKthId=${kthid})`,
-    timeLimit: 10,
-    paging: true,
-    attributes,
-    paged: {
-      pageSize: 1000,
-      pagePause: false
-    }
-  })
-  const ugUser = await new Promise((resolve, reject) => {
-    const user = []
-    ldapResults.on('searchEntry', ({object}) => user.push(object))
-    ldapResults.on('end', () => resolve(user))
-    ldapResults.on('error', reject)
-  })
-  if (ugUser.length > 0) {
-    return ugUser[0]
-  } else {
-    return {}
-  }
-}
-
 async function exportResults2 (req, res) {
   let courseRound = req.query.courseRound
   const canvasCourseId = req.query.canvasCourseId
   console.log(`Should export for ${courseRound} / ${canvasCourseId}`)
   try {
-    const ldapClient = Promise.promisifyAll(ldap.createClient({
-      url: process.env.LDAP_URL || 'ldaps://ldap.kth.se'
-    }))
-    await ldapClient.bindAsync(process.env.LDAP_USERNAME, process.env.LDAP_PASSWORD)
+    const ldapClient = await ldap.getBoundClient()
     const auth = await rp({
       method: 'POST',
       uri: `https://${settings.canvas_host}/login/oauth2/token`,
@@ -83,7 +53,7 @@ async function exportResults2 (req, res) {
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
     res.write(csv.createLine(csvHeader))
     for (let student of students) {
-      const ugUser = await lookupUserInLdap(ldapClient, student.sis_user_id)
+      const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
       let row = {
         kthid: student.sis_user_id,
         givenName: ugUser.givenName,

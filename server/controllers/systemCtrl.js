@@ -2,9 +2,8 @@
 
 const packageFile = require('../../package.json')
 const getPaths = require('kth-node-express-routing').getPaths
-
-const registry = require('component-registry').globalRegistry
-const { IHealthCheck } = require('kth-node-monitor').interfaces
+const settings = require('../configuration').server
+const ldap = require('./ldap')
 
 /**
  * System controller for functions such as about and monitor.
@@ -38,6 +37,7 @@ function getAbout (req, res) {
 <html><head><title>${packageFile.name} ${packageFile.version}</title></head>
 <body><h1>${packageFile.name} ${packageFile.version}</h1>
 <p>${packageFile.description}</p>
+<p>Canvas is ${settings.canvas_host}</p>
 <p><a href="${paths.system.monitor.uri}">system status</a></p>
 </body></html>
 `)
@@ -47,34 +47,25 @@ function getAbout (req, res) {
  * GET /_monitor
  * Monitor page
  */
-function getMonitor (req, res) {
-  const subSystems = []
-
-  // If we need local system checks, such as memory or disk, we would add it here.
-  // Make sure it returns a promise which resolves with an object containing:
-  // {statusCode: ###, message: '...'}
-  // The property statusCode should be standard HTTP status codes.
-  const localSystems = Promise.resolve({ statusCode: 200, message: 'OK' })
-
-  /* -- You will normally not change anything below this line -- */
-
-  // Determine system health based on the results of the checks above. Expects
-  // arrays of promises as input. This returns a promise
-  const systemHealthUtil = registry.getUtility(IHealthCheck, 'kth-node-system-check')
-  const systemStatus = systemHealthUtil.status(localSystems, subSystems)
-
-  systemStatus.then((status) => {
-    // Return the result either as JSON or text
-    if (req.headers['accept'] === 'application/json') {
-      let outp = systemHealthUtil.renderJSON(status)
-      res.status(status.statusCode).json(outp)
+async function getMonitor (req, res) {
+  try {
+    const ldapClient = await ldap.getBoundClient()
+    const u1famwov = await ldap.lookupUser(ldapClient, 'u1famwov')
+    let ldapStatus
+    let globalStatus = 'OK'
+    if (u1famwov.sn) {
+      ldapStatus = `OK Could lookup u1famwov in ldap (got ${u1famwov.givenName} ${u1famwov.sn})`
     } else {
-      let outp = systemHealthUtil.renderText(status)
-      res.type('text').status(status.statusCode).send(outp)
+      ldapStatus = 'ERROR Failed to lookup u1famwov in ldap'
+      globalStatus = 'ERROR'
     }
-  }).catch((err) => {
-    res.type('text').status(500).send(err)
-  })
+    res.type('text').status(200).send(
+      `APPLICATION_STATUS: ${globalStatus}
+LDAP: ${ldapStatus}`)
+  } catch (err) {
+    console.log(`Failed to display status page: ${err}`)
+    res.type('text').status(500).send(`Error: ${err}`)
+  }
 }
 
 /**

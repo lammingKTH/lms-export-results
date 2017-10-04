@@ -18,7 +18,6 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "body-parser": "^1.15.2",
-    "component-registry": "^0.2.0",
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
     "express": "^4.16.1",
@@ -30,7 +29,6 @@
     "kth-node-configuration": "^1.4.5",
     "kth-node-express-routing": "^0.3.1",
     "kth-node-log": "^2.0.3",
-    "kth-node-monitor": "^0.1.5",
     "kth-node-response": "KTH/kth-node-response.git#v1.0.0",
     "kth-node-server": "^3.0.3",
     "ldapjs": "^1.0.1",
