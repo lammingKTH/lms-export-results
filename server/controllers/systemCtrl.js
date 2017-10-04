@@ -4,6 +4,7 @@ const packageFile = require('../../package.json')
 const getPaths = require('kth-node-express-routing').getPaths
 const settings = require('../configuration').server
 const ldap = require('./ldap')
+const version = require('../../config/version')
 
 /**
  * System controller for functions such as about and monitor.
@@ -34,10 +35,11 @@ function getAbout (req, res) {
   const paths = getPaths()
   res.status(200).send(
     `<doctype html>
-<html><head><title>${packageFile.name} ${packageFile.version}</title></head>
+<html><head><title>${packageFile.name} ${packageFile.version}.${version.jenkinsBuild}</title></head>
 <body><h1>${packageFile.name} ${packageFile.version}</h1>
 <p>${packageFile.description}</p>
 <p>Canvas is ${settings.canvas_host}</p>
+<p>Build on ${version.jenkinsBuildDate} from git ${version.gitCommit}.</p>
 <p><a href="${paths.system.monitor.uri}">system status</a></p>
 </body></html>
 `)
