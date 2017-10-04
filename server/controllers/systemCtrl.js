@@ -33,10 +33,12 @@ function getSwagger (req, res) {
  */
 function getAbout (req, res) {
   const paths = getPaths()
+  const splitver = packageFile.version.split('.')
+  const fullVersion = `${splitver[0]}.${splitver[1]}.${version.jenkinsBuild}`
   res.status(200).send(
     `<doctype html>
-<html><head><title>${packageFile.name} ${packageFile.version}.${version.jenkinsBuild}</title></head>
-<body><h1>${packageFile.name} ${packageFile.version}</h1>
+<html><head><title>${packageFile.name} ${fullVersion}</title></head>
+<body><h1>${packageFile.name} ${fullVersion}</h1>
 <p>${packageFile.description}</p>
 <p>Canvas is ${settings.canvas_host}</p>
 <p>Build on ${version.jenkinsBuildDate} from git ${version.gitCommit}.</p>
