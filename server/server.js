@@ -73,7 +73,7 @@ server.all(config.proxyPrefixPath.uri + '/post2', exportResults2) // Deprecated,
 server.get(config.proxyPrefixPath.uri + '/export2', exportResults2)
 
 // Catch not found and errors
-// server.use(notFoundHandler)
-// server.use(errorHandler)
+server.use(notFoundHandler)
+server.use(errorHandler)
 
 module.exports = server

@@ -20,7 +20,7 @@ function exportResults (req, res) {
 }
 
 async function getAccessToken ({clientId, clientSecret, redirectUri, code}) {
-  const {access_token} = await rp({
+  const auth = await rp({
     method: 'POST',
     uri: `https://${settings.canvas_host}/login/oauth2/token`,
     body: {
@@ -32,11 +32,10 @@ async function getAccessToken ({clientId, clientSecret, redirectUri, code}) {
     },
     json: true
   })
-  console.log('access_token', access_token)
-  return access_token
+  return auth.access_token
 }
 
-async function getAssignmentIdsAndHeaders({canvasApi, canvasCourseId}) {
+async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
   const assignmentIds = []
   const headers = {}
 
@@ -50,7 +49,7 @@ async function getAssignmentIdsAndHeaders({canvasApi, canvasCourseId}) {
   return {assignmentIds, headers}
 }
 
-async function createSubmissionLine({student, ldapClient, assignmentIds}) {
+async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
   const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
   let row = {
     kthid: student.sis_user_id,
@@ -68,7 +67,7 @@ async function createSubmissionLine({student, ldapClient, assignmentIds}) {
     row['givenName'] || '',
     row['surname'] || '',
     row['personnummer'] || ''
-  ].concat(assignmentIds.map(id => row[id] || '-' ))
+  ].concat(assignmentIds.map(id => row[id] || '-'))
 }
 
 async function exportResults2 (req, res) {
@@ -90,7 +89,7 @@ async function exportResults2 (req, res) {
 
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
-    const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(id => headers[id] ))
+    const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(id => headers[id]))
     res.status(200)
     res.contentType('csv')
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
