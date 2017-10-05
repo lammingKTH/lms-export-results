@@ -50,7 +50,9 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
 }
 
 async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
+
   const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
+
   let row = {
     kthid: student.sis_user_id,
     givenName: ugUser.givenName,
@@ -71,7 +73,6 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
 }
 
 async function exportResults2 (req, res) {
-  console.log('hhh')
   const courseRound = req.query.courseRound
   const canvasCourseId = req.query.canvasCourseId
   log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
