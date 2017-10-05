@@ -6,7 +6,7 @@ const settings = require('../configuration').server
 const CanvasApi = require('kth-canvas-api')
 const csv = require('./csvFile')
 const ldap = require('./ldap')
-
+require('colors')
 function exportResults (req, res) {
   let b = req.body
   // console.log(b)
@@ -19,9 +19,21 @@ function exportResults (req, res) {
   res.redirect(basicUrl)
 }
 
+console.log('TODO! Remove this function before going into production!!!'.redBG)
+async function tempExportResults (req, res) {
+  const _req = {
+    query:{
+      courseRound:'',
+      canvasCourseId: '3960',
+      code:'91dc8f60677f94cbf05e8b961177ed2732c64c0a61d8a4bc22a164f19a598c903e58197afedde97d77b7bf7792826390aa2a13de72607a0ca016196903c0e306'
+  }}
+}
+
 async function exportResults2 (req, res) {
-  let courseRound = req.query.courseRound
+  const courseRound = req.query.courseRound
   const canvasCourseId = req.query.canvasCourseId
+  console.log('courseRound', courseRound, 'canvasCourseId', canvasCourseId)
+  console.log(req.query.code)
   log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
   try {
     const ldapClient = await ldap.getBoundClient()

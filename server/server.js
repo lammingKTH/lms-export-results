@@ -72,8 +72,6 @@ server.post(config.proxyPrefixPath.uri + '/export', exportResults)
 server.all(config.proxyPrefixPath.uri + '/post2', exportResults2) // Deprecated, use /export2 instead
 server.get(config.proxyPrefixPath.uri + '/export2', exportResults2)
 
-// const express = require('express')
-
 // Catch not found and errors
 server.use(notFoundHandler)
 server.use(errorHandler)
