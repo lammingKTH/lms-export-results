@@ -10,10 +10,13 @@ const bunyan = require('bunyan')
 console.log('Nu ska jag sätta upp bunyan...')
 var log = bunyan.createLogger({
   name:'node-logger',
-  app: packageFile.name
+  app: packageFile.name,
+  serializers: {
+    err: bunyan.stdSerializers.err
+  }
 })
 // test the logging...
-log.info('Emil säger hej...')
+log.info('Emil säger hej 2')
 log.info(new Error('Oh no! something something...'))
 
 /* ****************************
