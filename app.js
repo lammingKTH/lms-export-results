@@ -1,12 +1,14 @@
 'use strict'
 // Load .env file if it exists
 require('dotenv').config()
+const packageFile = require('./package.json')
 
 const config = require('./server/configuration').server
 const server = require('./server/server')
 const bunyan = require('bunyan')
 
-var log = bunyan.createLogger({name: 'myapp'})
+console.log('Nu ska jag sätta upp bunyan...')
+var log = bunyan.createLogger({name: packageFile.name})
 // test the logging...
 log.info('Emil säger hej...')
 log.error(new Error('Oh no! something something...'))
