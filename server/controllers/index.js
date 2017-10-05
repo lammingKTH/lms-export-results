@@ -21,35 +21,45 @@ function exportResults (req, res) {
 
 console.log('TODO! Remove this function before going into production!!!'.redBG)
 async function tempExportResults (req, res) {
-  const _req = {
-    query:{
-      courseRound:'',
-      canvasCourseId: '3960',
-      code:'91dc8f60677f94cbf05e8b961177ed2732c64c0a61d8a4bc22a164f19a598c903e58197afedde97d77b7bf7792826390aa2a13de72607a0ca016196903c0e306'
-  }}
+  req.query = {
+    courseRound: '',
+    canvasCourseId: '3960',
+    code: '91dc8f60677f94cbf05e8b961177ed2732c64c0a61d8a4bc22a164f19a598c903e58197afedde97d77b7bf7792826390aa2a13de72607a0ca016196903c0e306'
+  }
+  return await exportResults2(req, res)
+}
+
+async function getAccessToken({clientId, clientSecret,redirectUri, code}){
+  const {access_token} = await rp({
+    method: 'POST',
+    uri: `https://${settings.canvas_host}/login/oauth2/token`,
+    body: {
+      grant_type: 'authorization_code',
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUri,
+      code
+    },
+    json: true
+  })
+  return access_token
 }
 
 async function exportResults2 (req, res) {
   const courseRound = req.query.courseRound
   const canvasCourseId = req.query.canvasCourseId
-  console.log('courseRound', courseRound, 'canvasCourseId', canvasCourseId)
-  console.log(req.query.code)
   log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
   try {
     const ldapClient = await ldap.getBoundClient()
-    const auth = await rp({
-      method: 'POST',
-      uri: `https://${settings.canvas_host}/login/oauth2/token`,
-      body: {
-        grant_type: 'authorization_code',
-        client_id: process.env.CANVAS_CLIENT_ID,
-        client_secret: process.env.CANVAS_CLIENT_SECRET,
-        redirect_uri: req.protocol + '://' + req.get('host') + req.originalUrl,
-        code: req.query.code
-      },
-      json: true
+
+    const accessToken = getAccessToken({
+      clientId: process.env.CANVAS_CLIENT_ID,
+      clientSecret: process.env.CANVAS_CLIENT_SECRET,
+      redirectUri:req.protocol + '://' + req.get('host') + req.originalUrl,
+      code:req.query.code
     })
-    const canvasApi = new CanvasApi(`https://${settings.canvas_host}/api/v1`, auth.access_token)
+
+    const canvasApi = new CanvasApi(`https://${settings.canvas_host}/api/v1`, access_token)
     const assignments = await canvasApi.requestCanvas(`courses/${canvasCourseId}/assignments`)
     const assignmentIds = []
     const headers = {}
@@ -92,5 +102,6 @@ module.exports = {
   System: require('./systemCtrl'),
 
   exportResults,
-  exportResults2
+  exportResults2,
+  tempExportResults
 }
