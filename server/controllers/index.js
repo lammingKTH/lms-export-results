@@ -21,15 +21,15 @@ function exportResults (req, res) {
 
 console.log('TODO! Remove this function before going into production!!!'.redBG)
 async function tempExportResults (req, res) {
-  req.query = {
-    courseRound: '',
-    canvasCourseId: '3960',
-    code: '91dc8f60677f94cbf05e8b961177ed2732c64c0a61d8a4bc22a164f19a598c903e58197afedde97d77b7bf7792826390aa2a13de72607a0ca016196903c0e306'
-  }
-  return await exportResults2(req, res)
+  // req.query = {
+  //   courseRound: '',
+  //   canvasCourseId: '3960',
+  //   code: ''
+  // }
+  // return await exportResults2(req, res)
 }
 
-async function getAccessToken({clientId, clientSecret,redirectUri, code}){
+async function getAccessToken ({clientId, clientSecret, redirectUri, code}) {
   const {access_token} = await rp({
     method: 'POST',
     uri: `https://${settings.canvas_host}/login/oauth2/token`,
@@ -45,6 +45,20 @@ async function getAccessToken({clientId, clientSecret,redirectUri, code}){
   return access_token
 }
 
+async function getStudentsSubmissions (access_token) {
+  const canvasApi = new CanvasApi(`https://${settings.canvas_host}/api/v1`, access_token)
+  const assignments = await canvasApi.requestCanvas(`courses/${canvasCourseId}/assignments`)
+  const assignmentIds = []
+  const headers = {}
+  for (let t of assignments) {
+    const id = '' + t.id
+    assignmentIds.push(id)
+    headers[id] = `${t.name} (${t.id})`
+  }
+  const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(function (id) { return headers[id] }))
+  return await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
+}
+
 async function exportResults2 (req, res) {
   const courseRound = req.query.courseRound
   const canvasCourseId = req.query.canvasCourseId
@@ -55,21 +69,12 @@ async function exportResults2 (req, res) {
     const accessToken = getAccessToken({
       clientId: process.env.CANVAS_CLIENT_ID,
       clientSecret: process.env.CANVAS_CLIENT_SECRET,
-      redirectUri:req.protocol + '://' + req.get('host') + req.originalUrl,
-      code:req.query.code
+      redirectUri: req.protocol + '://' + req.get('host') + req.originalUrl,
+      code: req.query.code
     })
 
-    const canvasApi = new CanvasApi(`https://${settings.canvas_host}/api/v1`, access_token)
-    const assignments = await canvasApi.requestCanvas(`courses/${canvasCourseId}/assignments`)
-    const assignmentIds = []
-    const headers = {}
-    for (let t of assignments) {
-      const id = '' + t.id
-      assignmentIds.push(id)
-      headers[id] = `${t.name} (${t.id})`
-    }
-    const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(function (id) { return headers[id] }))
-    const students = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
+    const students = await getStudentsSubmissions(access_token)
+
     // So far so good, start constructing the output
     res.status(200)
     res.contentType('csv')
