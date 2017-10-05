@@ -4,7 +4,12 @@ require('dotenv').config()
 
 const config = require('./server/configuration').server
 const server = require('./server/server')
-const log = require('kth-node-log')
+const bunyan = require('bunyan')
+
+var log = bunyan.createLogger({name: 'myapp'})
+// test the logging...
+log.info('Emil säger hej...')
+log.error(new Error('Oh no! something something...'))
 
 /* ****************************
  * ******* SERVER START *******
