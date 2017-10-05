@@ -8,7 +8,10 @@ const server = require('./server/server')
 const bunyan = require('bunyan')
 
 console.log('Nu ska jag sätta upp bunyan...')
-var log = bunyan.createLogger({name: packageFile.name})
+var log = bunyan.createLogger({
+  name:'node-logger',
+  app: packageFile.name
+})
 // test the logging...
 log.info('Emil säger hej...')
 log.error(new Error('Oh no! something something...'))
