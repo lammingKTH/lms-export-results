@@ -16,8 +16,8 @@ var log = bunyan.createLogger({
   }
 })
 // test the logging...
-log.info('Emil säger hej 2')
-log.info(new Error('Oh no! something something...'))
+log.info('Emil säger hej 3')
+log.error(new Error('Oh no! something something...'))
 
 /* ****************************
  * ******* SERVER START *******
