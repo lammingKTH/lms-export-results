@@ -12,7 +12,6 @@
     "start-dev": "NODE_ENV=development nodemon app.js"
   },
   "pre-push": [
-    "codecheck",
     "test"
   ],
   "dependencies": {
