@@ -67,8 +67,10 @@ systemRoute.get('system.paths', config.proxyPrefixPath.uri + '/_paths', System.p
 systemRoute.get('system.robots', '/robots.txt', System.robotsTxt)
 
 server.use('/', systemRoute.getRouter())
-server.all(config.proxyPrefixPath.uri + '/post', exportResults)
-server.all(config.proxyPrefixPath.uri + '/post2', exportResults2)
+server.all(config.proxyPrefixPath.uri + '/post', exportResults) // Deprecated, use /export instead
+server.post(config.proxyPrefixPath.uri + '/export', exportResults)
+server.all(config.proxyPrefixPath.uri + '/post2', exportResults2) // Deprecated, use /export2 instead
+server.get(config.proxyPrefixPath.uri + '/export2', exportResults2)
 
 // const express = require('express')
 
