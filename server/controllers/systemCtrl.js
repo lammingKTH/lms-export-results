@@ -28,18 +28,22 @@ function getSwagger (req, res) {
   res.json(require('../../swagger.json'))
 }
 
+function getNameAndVersion() {
+  const splitver = packageFile.version.split('.')
+  return `${packageFile.name} ${splitver[0]}.${splitver[1]}.${version.jenkinsBuild}`
+}
+
 /**
  * GET /_about
  * About page
  */
 function getAbout (req, res) {
   const paths = getPaths()
-  const splitver = packageFile.version.split('.')
-  const fullVersion = `${splitver[0]}.${splitver[1]}.${version.jenkinsBuild}`
+  const appName = getNameAndVersion()
   res.status(200).send(
     `<!doctype html>
-<html><head><title>${packageFile.name} ${fullVersion}</title></head>
-<body><h1>${packageFile.name} ${fullVersion}</h1>
+<html><head><title>${appName}</title></head>
+<body><h1>${appName}</h1>
 <p>${packageFile.description}</p>
 <p>Canvas is ${settings.canvas_host}</p>
 <p>Build on ${version.jenkinsBuildDate} from git ${version.gitCommit}.</p>
@@ -54,10 +58,11 @@ function getAbout (req, res) {
  */
 async function getMonitor (req, res) {
   try {
+    const appName = getNameAndVersion()
+    let globalStatus = 'OK'
     const ldapClient = await ldap.getBoundClient()
     const u1famwov = await ldap.lookupUser(ldapClient, 'u1famwov')
     let ldapStatus
-    let globalStatus = 'OK'
     if (u1famwov.sn) {
       ldapStatus = `OK Could lookup u1famwov in ldap (got ${u1famwov.givenName} ${u1famwov.sn})`
     } else {
@@ -65,7 +70,7 @@ async function getMonitor (req, res) {
       globalStatus = 'ERROR'
     }
     res.type('text').status(200).send(
-      `APPLICATION_STATUS: ${globalStatus}
+      `APPLICATION_STATUS: ${globalStatus} ${appName}
 LDAP: ${ldapStatus}`)
   } catch (err) {
     log.error('Failed to display status page:', err)
