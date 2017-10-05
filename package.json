@@ -28,7 +28,7 @@
     "kth-node-api-key-strategy": "^1.0.5",
     "kth-node-configuration": "^1.4.5",
     "kth-node-express-routing": "^0.3.1",
-    "kth-node-log": "^2.0.3",
+    "bunyan": "^1.5.1",
     "kth-node-response": "KTH/kth-node-response.git#v1.0.0",
     "kth-node-server": "^3.0.3",
     "ldapjs": "^1.0.1",

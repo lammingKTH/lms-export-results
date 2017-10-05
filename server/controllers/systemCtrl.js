@@ -1,6 +1,6 @@
 'use strict'
 
-const log = require('kth-node-log')
+const log = require('../log')
 const packageFile = require('../../package.json')
 const getPaths = require('kth-node-express-routing').getPaths
 const settings = require('../configuration').server

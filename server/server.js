@@ -16,19 +16,8 @@ module.exports = server
  * ******* LOGGING *******
  * ***********************
  */
-const log = require('kth-node-log')
+const log = require('./log')
 const packageFile = require('../package.json')
-
-let logConfiguration = {
-  name: packageFile.name,
-  app: packageFile.name,
-  env: process.env.NODE_ENV,
-  level: config.logging.log.level,
-  console: config.logging.console,
-  stdout: config.logging.stdout,
-  src: config.logging.src
-}
-log.init(logConfiguration)
 
 /* ******************************
  * ******* ACCESS LOGGING *******

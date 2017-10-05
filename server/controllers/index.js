@@ -1,5 +1,5 @@
 'use strict'
-const log = require('kth-node-log')
+const log = require('../log')
 const querystring = require('querystring')
 const rp = require('request-promise')
 const settings = require('../configuration').server
