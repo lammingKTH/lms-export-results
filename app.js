@@ -9,6 +9,9 @@ const log = require('./server/log')
  * ******* SERVER START *******
  * ****************************
  */
+
+log.info(new Error('Error from info'))
+log.error(new Error('Error from error'))
 module.exports = server.start({
   useSsl: config.useSsl,
   pfx: config.ssl.pfx,
