@@ -29,7 +29,7 @@ LDAP_PASSWORD
 #### Add an external tool
 ```
 NAME="Exportera resultat $USER"
-curl -X POST 'https://kth.beta.instructure.com/api/v1/accounts/1/external_tools' \
+curl -X POST 'https://kth.test.instructure.com/api/v1/accounts/1/external_tools' \
      -H "Authorization: Bearer $CANVAS_TOKEN" \
      -F "name=$NAME" \
      -F 'consumer_key=asdfg' \

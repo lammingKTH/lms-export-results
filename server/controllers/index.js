@@ -82,6 +82,7 @@ function exportResults2(req, res) {
     // Hack to make Canvas see that the auth is finished and the
     // 'please wait' text can be removed
     res.send(`
+    Din fil är på väg. Om inget hänt inom några minuter, försök igen.
     <script>
     document.location='exportResults3${req._parsedUrl.search}'
     </script>
