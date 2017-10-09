@@ -83,7 +83,7 @@ function exportResults2(req, res) {
     // 'please wait' text can be removed
     res.send(`
     <script>
-    document.location='download${req._parsedUrl.search}'
+    document.location='exportResults3${req._parsedUrl.search}'
     </script>
       `)
     // res.redirect('download' + req._parsedUrl.search)
@@ -93,7 +93,7 @@ function exportResults2(req, res) {
   }
 }
 
-async function download (req, res) {
+async function exportResults3 (req, res) {
   try {
     const courseRound = req.query.courseRound
     const canvasCourseId = req.query.canvasCourseId
@@ -133,5 +133,5 @@ module.exports = {
 
   exportResults,
   exportResults2,
-  download
+  exportResults3
 }
