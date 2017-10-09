@@ -99,7 +99,7 @@ async function exportResults2 (req, res) {
       const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds})
       res.write(csv.createLine(csvLine))
     }
-    res.send('OK')
+    res.send()
   } catch (e) {
     log.error('Export failed:', e)
     res.status(500).send('Trasigt')
