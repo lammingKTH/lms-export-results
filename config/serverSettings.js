@@ -45,5 +45,5 @@ module.exports = {
   },
 
   // Custom app settings
-  canvas_host: 'kth.test.instructure.com'
+  canvas_host: getEnv('CANVAS_HOST', 'kth.test.instructure.com')
 }
