@@ -46,7 +46,7 @@ server.use(cookieParser())
  */
 // const addPaths = require('kth-node-express-routing').addPaths
 const { notFoundHandler, errorHandler } = require('kth-node-api-common')
-const { System, exportResults, exportResults2 } = require('./controllers')
+const { System, exportResults, exportResults2, download } = require('./controllers')
 
 // System pages routes
 const systemRoute = AppRouter()
@@ -60,6 +60,7 @@ server.all(config.proxyPrefixPath.uri + '/post', exportResults) // Deprecated, u
 server.post(config.proxyPrefixPath.uri + '/export', exportResults)
 server.all(config.proxyPrefixPath.uri + '/post2', exportResults2) // Deprecated, use /export2 instead
 server.get(config.proxyPrefixPath.uri + '/export2', exportResults2)
+server.get(config.proxyPrefixPath.uri + '/download', download)
 
 // Catch not found and errors
 server.use(notFoundHandler)

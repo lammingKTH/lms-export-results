@@ -77,7 +77,23 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
   ].concat(assignmentIds.map(id => row[id] || '-'))
 }
 
-async function exportResults2 (req, res) {
+function exportResults2(req, res) {
+  try {
+    // Hack to make Canvas see that the auth is finished and the
+    // 'please wait' text can be removed
+    res.send(`
+    <script>
+    document.location='download${req._parsedUrl.search}'
+    </script>
+      `)
+    // res.redirect('download' + req._parsedUrl.search)
+  } catch (e) {
+    log.error('Export failed:', e)
+    res.status(500).send('Trasigt')
+  }
+}
+
+async function download (req, res) {
   try {
     const courseRound = req.query.courseRound
     const canvasCourseId = req.query.canvasCourseId
@@ -96,8 +112,8 @@ async function exportResults2 (req, res) {
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
     const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(id => headers[id]))
-    res.status(200)
-    res.contentType('csv')
+
+    res.type('text/csv')
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
     res.write(csv.createLine(csvHeader))
     for (let student of students) {
@@ -116,5 +132,6 @@ module.exports = {
   System: require('./systemCtrl'),
 
   exportResults,
-  exportResults2
+  exportResults2,
+  download
 }
