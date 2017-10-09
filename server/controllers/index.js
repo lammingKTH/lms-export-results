@@ -8,15 +8,20 @@ const csv = require('./csvFile')
 const ldap = require('./ldap')
 
 function exportResults (req, res) {
-  let b = req.body
-  // console.log(b)
-  let courseRound = b.lis_course_offering_sourcedid
-  const canvasCourseId = b.custom_canvas_course_id
-  const fullUrl = (process.env.PROXY_BASE || (req.protocol + '://' + req.get('host'))) + req.originalUrl
-  const nextUrl = fullUrl + '2?' + querystring.stringify({courseRound, canvasCourseId})
-  log.info('Tell auth to redirect back to', nextUrl)
-  const basicUrl = `https://${settings.canvas_host}/login/oauth2/auth?` + querystring.stringify({client_id: process.env.CANVAS_CLIENT_ID, response_type: 'code', redirect_uri: nextUrl})
-  res.redirect(basicUrl)
+  try {
+    let b = req.body
+    // console.log(b)
+    let courseRound = b.lis_course_offering_sourcedid
+    const canvasCourseId = b.custom_canvas_course_id
+    const fullUrl = (process.env.PROXY_BASE || (req.protocol + '://' + req.get('host'))) + req.originalUrl
+    const nextUrl = fullUrl + '2?' + querystring.stringify({courseRound, canvasCourseId})
+    log.info('Tell auth to redirect back to', nextUrl)
+    const basicUrl = `https://${settings.canvas_host}/login/oauth2/auth?` + querystring.stringify({client_id: process.env.CANVAS_CLIENT_ID, response_type: 'code', redirect_uri: nextUrl})
+    res.redirect(basicUrl)
+  } catch (e) {
+    log.error('Export failed:', e)
+    res.status(500).send('Trasigt')
+  }
 }
 
 async function getAccessToken ({clientId, clientSecret, redirectUri, code}) {
@@ -73,10 +78,10 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
 }
 
 async function exportResults2 (req, res) {
-  const courseRound = req.query.courseRound
-  const canvasCourseId = req.query.canvasCourseId
-  log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
   try {
+    const courseRound = req.query.courseRound
+    const canvasCourseId = req.query.canvasCourseId
+    log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
     const ldapClient = await ldap.getBoundClient()
     const accessToken = await getAccessToken({
       clientId: process.env.CANVAS_CLIENT_ID,
