@@ -76,7 +76,7 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
     row['personnummer'] || ''
   ].concat(assignmentIds.map(id => row[id] || '-'))
 }
-
+//
 function exportResults2(req, res) {
   try {
     // Hack to make Canvas see that the auth is finished and the
