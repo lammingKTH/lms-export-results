@@ -10,6 +10,10 @@ const log = require('./server/log')
  * ****************************
  */
 
+const rp = require('request-promise')
+rp('https://api.ipify.org?format=json')
+.then((ip) => log.info('ip:',ip))
+
 module.exports = server.start({
   useSsl: config.useSsl,
   pfx: config.ssl.pfx,
