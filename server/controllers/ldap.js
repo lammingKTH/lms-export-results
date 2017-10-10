@@ -1,7 +1,7 @@
 const log = require('../log')
 const Promise = require('bluebird')
 const ldap = require('ldapjs')
-
+//
 function getBoundClient () {
   return new Promise((resolve, reject) => {
     const options = {
