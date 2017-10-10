@@ -10,7 +10,9 @@ function getBoundClient () {
       connectTimeout: 1000,
       log: log
     }
-    log.info('Should get ldap client for', options)
+    const username = process.env.LDAP_USERNAME
+    const password = process.env.LDAP_PASSWORD
+    log.info('Should get ldap client for', username, 'on', options.url)
     const ldapClient = ldap.createClient(options)
     const doReject = function (e) {
       log.debug('In ldapClient rejection callback:', e)
@@ -19,7 +21,7 @@ function getBoundClient () {
     ldapClient.on('error', doReject)
     ldapClient.on('timeout', doReject)
     ldapClient.on('connectTimeout', doReject)
-    ldapClient.bind(process.env.LDAP_USERNAME, process.env.LDAP_PASSWORD, function (err) {
+    ldapClient.bind(username, password, function (err) {
       if (err) {
         reject(err)
       } else {
