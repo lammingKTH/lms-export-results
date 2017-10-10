@@ -36,7 +36,7 @@ function lookupUser (ldapClient, kthid) {
   return new Promise((resolve, reject) => {
     log.info('Should try to search')
     ldapClient.search(
-      'ou=UG,dc=referens,dc=sys,dc=kth,dc=se',
+      process.env.LDAP_BASE || 'ou=UG,dc=kth,dc=se',
       {
         scope: 'sub',
         filter: `(ugKthId=${kthid})`,
