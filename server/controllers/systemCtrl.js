@@ -5,6 +5,7 @@ const packageFile = require('../../package.json')
 const getPaths = require('kth-node-express-routing').getPaths
 const settings = require('../configuration').server
 const ldap = require('./ldap')
+const rp = require('request-promise')
 const version = require('../../config/version')
 
 /**
@@ -60,18 +61,38 @@ async function getMonitor (req, res) {
   try {
     const appName = getNameAndVersion()
     let globalStatus = 'OK'
-    const ldapClient = await ldap.getBoundClient()
-    const u1famwov = await ldap.lookupUser(ldapClient, 'u1famwov')
     let ldapStatus
-    if (u1famwov.sn) {
-      ldapStatus = `OK Could lookup u1famwov in ldap (got ${u1famwov.givenName} ${u1famwov.sn})`
-    } else {
+    let ipStatus
+    try {
+      const ldapClient = await ldap.getBoundClient()
+      const u1famwov = await ldap.lookupUser(ldapClient, 'u1famwov')
+      if (u1famwov.sn) {
+	ldapStatus = `OK Could lookup u1famwov in ldap (got ${u1famwov.givenName} ${u1famwov.sn})`
+      } else {
+	ldapStatus = 'ERROR Failed to lookup u1famwov in ldap'
+	globalStatus = 'ERROR'
+      }
+    } catch (err) {
+      log.error('Failed to check ldap status:', err)
       ldapStatus = 'ERROR Failed to lookup u1famwov in ldap'
+      globalStatus = 'ERROR'
+    }
+    try {
+      const t = await rp({
+	method: 'GET',
+	uri: 'https://api.ipify.org?format=json',
+	json: true
+      })
+      ipStatus = t.ip
+    } catch (err) {
+      log.error('Failed to check ip address:', err)
+      ipStatus = 'ERROR Failed to ask ipify.org'
       globalStatus = 'ERROR'
     }
     res.type('text').status(200).send(
       `APPLICATION_STATUS: ${globalStatus} ${appName}
-LDAP: ${ldapStatus}`)
+LDAP: ${ldapStatus}
+IP: ${ipStatus}`)
   } catch (err) {
     log.error('Failed to display status page:', err)
     res.type('text').status(500).send('APPLICATION_STATUS ERROR\n')
