@@ -29,7 +29,7 @@ function getSwagger (req, res) {
   res.json(require('../../swagger.json'))
 }
 
-function getNameAndVersion() {
+function getNameAndVersion () {
   const splitver = packageFile.version.split('.')
   return `${packageFile.name} ${splitver[0]}.${splitver[1]}.${version.jenkinsBuild}`
 }
@@ -59,44 +59,62 @@ function getAbout (req, res) {
  */
 async function getMonitor (req, res) {
   try {
-    const appName = getNameAndVersion()
-    let globalStatus = 'OK'
-    let ldapStatus
-    let ipStatus
-    try {
-      const ldapClient = await ldap.getBoundClient()
-      const u1famwov = await ldap.lookupUser(ldapClient, 'u1famwov')
-      if (u1famwov.sn) {
-	ldapStatus = `OK Could lookup u1famwov in ldap (got ${u1famwov.givenName} ${u1famwov.sn})`
-      } else {
-	ldapStatus = 'ERROR Failed to lookup u1famwov in ldap'
-	globalStatus = 'ERROR'
-      }
-    } catch (err) {
-      log.error('Failed to check ldap status:', err)
-      ldapStatus = 'ERROR Failed to lookup u1famwov in ldap'
-      globalStatus = 'ERROR'
+    let status = {
+      'ok': true,
+      'msg': getNameAndVersion()
     }
-    try {
-      const t = await rp({
-	method: 'GET',
-	uri: 'https://api.ipify.org?format=json',
-	json: true
-      })
-      ipStatus = t.ip
-    } catch (err) {
-      log.error('Failed to check ip address:', err)
-      ipStatus = 'ERROR Failed to ask ipify.org'
-      globalStatus = 'ERROR'
-    }
-    res.type('text').status(200).send(
-      `APPLICATION_STATUS: ${globalStatus} ${appName}
-LDAP: ${ldapStatus}
-IP: ${ipStatus}`)
+    let body = ''
+
+    // NOTE The awaited status checkers hree should run in parallell.
+
+    const ldapStatus = await getStatus(checkLdap)
+    body = body + statusRow('LDAP', ldapStatus)
+    status.ok &= ldapStatus.ok
+
+    const ipStatus = await getStatus(checkIp)
+    body = body + statusRow('IP', ipStatus)
+    status.ok &= ipStatus.ok
+
+    res.type('text').status(200).send(statusRow('APPLICATION_STATUS', status) + body)
   } catch (err) {
     log.error('Failed to display status page:', err)
     res.type('text').status(500).send('APPLICATION_STATUS ERROR\n')
   }
+}
+
+function statusRow (name, status) {
+  return `${name}: ${status.ok ? 'OK' : 'ERROR'} ${status.msg}\n`
+}
+
+async function getStatus (method) {
+  try {
+    return await method()
+  } catch (err) {
+    log.error('Check failed:', err)
+    return {'ok': false, 'msg': `Error: ${err}`}
+  }
+}
+
+async function checkLdap () {
+  const ldapClient = await ldap.getBoundClient()
+  const u1famwov = await ldap.lookupUser(ldapClient, 'u1famwov')
+  if (u1famwov.sn) {
+    return {
+      'ok': true,
+      'msg': `Could lookup u1famwov in ldap (got ${u1famwov.givenName} ${u1famwov.sn})`
+    }
+  } else {
+    return {'ok': false, 'msg': 'ERROR Failed to lookup u1famwov in ldap'}
+  }
+}
+
+async function checkIp () {
+  const t = await rp({
+    method: 'GET',
+    uri: 'https://api.ipify.org?format=json',
+    json: true
+  })
+  return {'ok': true, msg: t.ip}
 }
 
 /**
