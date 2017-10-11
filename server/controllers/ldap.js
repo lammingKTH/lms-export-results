@@ -7,7 +7,7 @@ function getBoundClient () {
     const options = {
       url: process.env.LDAP_URL || 'ldaps://ldap.kth.se',
       timeout: 1000,
-      connectTimeout: 1000,
+      connectTimeout: 2000,
       log: log
     }
     const username = process.env.LDAP_USERNAME
