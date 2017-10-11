@@ -7,6 +7,8 @@ const CanvasApi = require('kth-canvas-api')
 const csv = require('./csvFile')
 const ldap = require('./ldap')
 
+const canvasApiUrl = `https://${settings.canvas_host}/api/v1`
+
 function exportResults (req, res) {
   try {
     let b = req.body
@@ -44,7 +46,7 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
   const assignmentIds = []
   const headers = {}
 
-  const assignments = await canvasApi.requestCanvas(`courses/${canvasCourseId}/assignments`)
+  const assignments = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/assignments`)
 
   for (let t of assignments) {
     const id = '' + t.id
@@ -112,7 +114,7 @@ async function exportResults3 (req, res) {
       code: req.query.code
     })
 
-    const canvasApi = new CanvasApi(`https://${settings.canvas_host}/api/v1`, accessToken)
+    const canvasApi = new CanvasApi(canvasApiUrl, accessToken)
     const students = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
 
     // So far so good, start constructing the output

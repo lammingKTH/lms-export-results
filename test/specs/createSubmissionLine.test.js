@@ -2,6 +2,7 @@ const test = require('tape')
 const rewire = require('rewire')
 const indexController = rewire('../../server/controllers')
 const createSubmissionLine = indexController.__get__('createSubmissionLine')
+
 test('should do something', t => {
   t.plan(1)
   const student = {}
