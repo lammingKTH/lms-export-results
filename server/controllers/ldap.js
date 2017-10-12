@@ -1,17 +1,21 @@
 const log = require('../log')
 const Promise = require('bluebird')
 const ldap = require('ldapjs')
-//
+const settings = require('../../config/serverSettings')
 function getBoundClient () {
   return new Promise((resolve, reject) => {
     const options = {
-      url: process.env.LDAP_URL || 'ldaps://ldap.kth.se',
+      url: settings.ldap.url,
       timeout: 1000,
       connectTimeout: 2000,
       log: log
     }
-    const username = process.env.LDAP_USERNAME
-    const password = process.env.LDAP_PASSWORD
+    // const username = process.env.LDAP_USERNAME
+    // const password = process.env.LDAP_PASSWORD
+
+    const username = settings.ldap.userName
+    const password = settings.ldap.password
+
     log.info('Should get ldap client for', username, 'on', options.url)
     const ldapClient = ldap.createClient(options)
     const doReject = function (e) {
@@ -36,7 +40,7 @@ function lookupUser (ldapClient, kthid) {
   return new Promise((resolve, reject) => {
     log.info('Should try to search')
     ldapClient.search(
-      process.env.LDAP_BASE || 'ou=UG,dc=kth,dc=se',
+      settings.ldap.base,
       {
         scope: 'sub',
         filter: `(ugKthId=${kthid})`,

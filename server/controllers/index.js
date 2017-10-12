@@ -7,18 +7,17 @@ const CanvasApi = require('kth-canvas-api')
 const csv = require('./csvFile')
 const ldap = require('./ldap')
 
-const canvasApiUrl = `https://${settings.canvas_host}/api/v1`
+const canvasApiUrl = `https://${settings.canvas.host}/api/v1`
 
 function exportResults (req, res) {
   try {
     let b = req.body
-    // console.log(b)
     let courseRound = b.lis_course_offering_sourcedid
     const canvasCourseId = b.custom_canvas_course_id
-    const fullUrl = (process.env.PROXY_BASE || (req.protocol + '://' + req.get('host'))) + req.originalUrl
+    const fullUrl = (settings.proxyBase || (req.protocol + '://' + req.get('host'))) + req.originalUrl
     const nextUrl = fullUrl + '2?' + querystring.stringify({courseRound, canvasCourseId})
     log.info('Tell auth to redirect back to', nextUrl)
-    const basicUrl = `https://${settings.canvas_host}/login/oauth2/auth?` + querystring.stringify({client_id: process.env.CANVAS_CLIENT_ID, response_type: 'code', redirect_uri: nextUrl})
+    const basicUrl = `https://${settings.canvas.host}/login/oauth2/auth?` + querystring.stringify({client_id: settings.canvas.clientId, response_type: 'code', redirect_uri: nextUrl})
     res.redirect(basicUrl)
   } catch (e) {
     log.error('Export failed:', e)
@@ -29,7 +28,7 @@ function exportResults (req, res) {
 async function getAccessToken ({clientId, clientSecret, redirectUri, code}) {
   const auth = await rp({
     method: 'POST',
-    uri: `https://${settings.canvas_host}/login/oauth2/token`,
+    uri: `https://${settings.canvas.host}/login/oauth2/token`,
     body: {
       grant_type: 'authorization_code',
       client_id: clientId,
@@ -108,8 +107,8 @@ async function exportResults3 (req, res) {
     log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
     const ldapClient = await ldap.getBoundClient()
     const accessToken = await getAccessToken({
-      clientId: process.env.CANVAS_CLIENT_ID,
-      clientSecret: process.env.CANVAS_CLIENT_SECRET,
+      clientId: settings.canvas.clientId,
+      clientSecret: settings.canvas.clientSecret,
       redirectUri: req.protocol + '://' + req.get('host') + req.originalUrl,
       code: req.query.code
     })

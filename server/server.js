@@ -1,34 +1,16 @@
 'use strict'
 const server = require('kth-node-server')
-// Load .env file in development mode (Do we need this here?  Its in app.js?)
-require('dotenv').config()
 // Now read the server config etc.
 const config = require('./configuration').server
 const AppRouter = require('kth-node-express-routing').PageRouter
-// const getPaths = require('kth-node-express-routing').getPaths
+
 
 // Expose the server and paths
 // server.locals.secret = new Map()
 module.exports = server
 // module.exports.getPaths = () => getPaths()
 
-/* ***********************
- * ******* LOGGING *******
- * ***********************
- */
 const log = require('./log')
-const packageFile = require('../package.json')
-
-/* ******************************
- * ******* ACCESS LOGGING *******
- * ******************************
- */
-const accessLog = require('kth-node-access-log')
-server.use(accessLog(config.logging.accessLog))
-
-// QUESTION: Should this really be set here?
-// http://expressjs.com/en/api.html#app.set
-server.set('case sensitive routing', true)
 
 /* *******************************
  * ******* REQUEST PARSING *******
