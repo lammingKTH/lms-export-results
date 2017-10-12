@@ -57,12 +57,19 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
 }
 
 async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
-  // const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id
-  let row = {
-    kthid: student.sis_user_id,
-    givenName: ugUser.givenName,
-    surname: ugUser.sn,
-    personnummer: ugUser.norEduPersonNIN
+  let row
+  try{
+    const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
+    row = {
+      kthid: student.sis_user_id,
+      givenName: ugUser.givenName,
+      surname: ugUser.sn,
+      personnummer: ugUser.norEduPersonNIN
+    }
+  }catch(err){
+    log.error('An error occured while trying to find user in ldap:', err)
+    log.info('No user from ldap, use empty row instead')
+    row = {}
   }
 
   for (let submission of student.submissions) {

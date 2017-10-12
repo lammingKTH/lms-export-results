@@ -50,7 +50,7 @@ function lookupUser (ldapClient, kthid) {
       },
       function (err, res) {
         if (err) {
-          log.debug('God err from search:', err)
+          log.debug('Got err from search:', err)
           reject(err)
         } else {
           let user
