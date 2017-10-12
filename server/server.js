@@ -9,7 +9,7 @@ const AppRouter = require('kth-node-express-routing').PageRouter
 // server.locals.secret = new Map()
 module.exports = server
 // module.exports.getPaths = () => getPaths()
-
+//
 const log = require('./log')
 
 /* *******************************
