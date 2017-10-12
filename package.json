@@ -1,7 +1,6 @@
 {
   "//": "The production flag is added in the jenkins build script.",
   "name": "lms-export-results",
-  "version": "0.2.0",
   "description": "Export results (betygsunderlag) from canvas to something that can be used for Ladok import (first attempt)",
   "main": "app.js",
   "private": true,

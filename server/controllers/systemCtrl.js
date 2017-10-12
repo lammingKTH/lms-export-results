@@ -30,8 +30,7 @@ function getSwagger (req, res) {
 }
 
 function getNameAndVersion () {
-  const splitver = packageFile.version.split('.')
-  return `${packageFile.name} ${splitver[0]}.${splitver[1]}.${version.jenkinsBuild}`
+  return `${packageFile.name} ${version.dockerVersion || 'UNKNOWN'}`
 }
 
 /**
