@@ -59,23 +59,27 @@ function getAbout (req, res) {
  */
 async function getMonitor (req, res) {
   try {
-    let status = {
+    log.debug("Start preparing monitor")
+    let checks = {
+      // Async functions that we do not await: Promises?
+      'LDAP': checkLdap(),
+      'IP': checkIp()
+    }
+    let main = {
       'ok': true,
       'msg': getNameAndVersion()
     }
     let body = ''
 
-    // NOTE The awaited status checkers hree should run in parallell.
+    log.debug("Start collecting monitor results")
+    for (let key in checks) {
+      const status = await getStatus(checks[key])
+      body = body + statusRow(key, status)
+      main.ok &= status.ok
+    }
 
-    const ldapStatus = await getStatus(checkLdap)
-    body = body + statusRow('LDAP', ldapStatus)
-    status.ok &= ldapStatus.ok
-
-    const ipStatus = await getStatus(checkIp)
-    body = body + statusRow('IP', ipStatus)
-    status.ok &= ipStatus.ok
-
-    res.type('text').status(200).send(statusRow('APPLICATION_STATUS', status) + body)
+    log.info("Done collecting monitor results", main)
+    res.type('text').status(200).send(statusRow('APPLICATION_STATUS', main) + body)
   } catch (err) {
     log.error('Failed to display status page:', err)
     res.type('text').status(500).send('APPLICATION_STATUS ERROR\n')
@@ -86,9 +90,9 @@ function statusRow (name, status) {
   return `${name}: ${status.ok ? 'OK' : 'ERROR'} ${status.msg}\n`
 }
 
-async function getStatus (method) {
+async function getStatus (resultPromise) {
   try {
-    return await method()
+    return await resultPromise
   } catch (err) {
     log.error('Check failed:', err)
     return {'ok': false, 'msg': `Error: ${err}`}
