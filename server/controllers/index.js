@@ -57,13 +57,7 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
 }
 
 async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
-  // const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
-  const ugUser = {
-    givenName: 'Mock name',
-    sn: 'Mock surname',
-    norEduPersonNIN: '123123123123'
-  }
-
+  // const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id
   let row = {
     kthid: student.sis_user_id,
     givenName: ugUser.givenName,
@@ -105,8 +99,7 @@ async function exportResults3 (req, res) {
     const courseRound = req.query.courseRound
     const canvasCourseId = req.query.canvasCourseId
     log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
-    // const ldapClient = await ldap.getBoundClient()
-    const ldapClient = {}
+    const ldapClient = await ldap.getBoundClient()
     const accessToken = await getAccessToken({
       clientId: process.env.CANVAS_CLIENT_ID,
       clientSecret: process.env.CANVAS_CLIENT_SECRET,
