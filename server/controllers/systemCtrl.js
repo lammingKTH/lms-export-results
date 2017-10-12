@@ -45,7 +45,7 @@ function getAbout (req, res) {
 <html><head><title>${appName}</title></head>
 <body><h1>${appName}</h1>
 <p>${packageFile.description}</p>
-<p>Canvas is ${settings.canvas_host}</p>
+<p>Canvas is ${settings.canvas.host}</p>
 <p>Build on ${version.jenkinsBuildDate} from git ${version.gitCommit}.</p>
 <p><a href="${paths.system.monitor.uri}">system status</a></p>
 </body></html>
