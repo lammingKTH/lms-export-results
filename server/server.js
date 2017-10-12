@@ -38,6 +38,8 @@ systemRoute.get('system.paths', config.proxyPrefixPath.uri + '/_paths', System.p
 systemRoute.get('system.robots', '/robots.txt', System.robotsTxt)
 
 server.use('/', systemRoute.getRouter())
+server.get(config.proxyPrefixPath.uri, (req, res)=>res.redirect(`${config.proxyPrefixPath.uri}/_about`))
+
 server.post(config.proxyPrefixPath.uri + '/export', exportResults)
 server.get(config.proxyPrefixPath.uri + '/export2', exportResults2)
 server.get(config.proxyPrefixPath.uri + '/exportResults3', exportResults3)
