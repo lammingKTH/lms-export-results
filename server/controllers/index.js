@@ -120,7 +120,7 @@ async function exportResults3 (req, res) {
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
     const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(id => headers[id]))
 
-    res.type('text/csv')
+    res.set({ 'content-type': 'text/csv; charset=utf-8' })
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
     res.write(csv.createLine(csvHeader))
     for (let student of students) {

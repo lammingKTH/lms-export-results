@@ -1,6 +1,3 @@
-const Promise = require('bluebird')
-const fs = Promise.promisifyAll(require('fs'))
-
 function escapeCsvData (str) {
   str = '' + str
 
@@ -8,7 +5,7 @@ function escapeCsvData (str) {
     console.warn('oh no! bad data!', str)
   }
 
-  if (str.includes(',')) {
+  if (str.includes(';')) {
     console.log('escaping ', str)
     str = `"${str}"`
   }
@@ -16,15 +13,10 @@ function escapeCsvData (str) {
   return str
 }
 
-function writeLine (strArr, fileName) {
-  const line = createLine(strArr)
-  return fs.appendFileAsync(fileName, line)
-}
-
 function createLine (strArr) {
-  return strArr.map(escapeCsvData).join(',') + '\n'
+  return strArr.map(escapeCsvData).join(';') + '\n'
 }
 
 module.exports = {
-  escapeCsvData, writeLine, createLine
+  createLine
 }
