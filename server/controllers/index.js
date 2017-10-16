@@ -80,7 +80,7 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
     student.user_id || '',
     row['givenName'] || '',
     row['surname'] || '',
-    `"${row['personnummer'] || ''}"`
+    `"${row['personnummer'] || ''}`
   ].concat(assignmentIds.map(id => row[id] || '-'))
 }
 //
