@@ -17,6 +17,7 @@ function exportResults (req, res) {
     const fullUrl = (settings.proxyBase || (req.protocol + '://' + req.get('host'))) + req.originalUrl
     const nextUrl = fullUrl + '2?' + querystring.stringify({courseRound, canvasCourseId})
     log.info('Tell auth to redirect back to', nextUrl)
+    log.info('using canvas client id', settings.canvas.clientId)
     const basicUrl = `https://${settings.canvas.host}/login/oauth2/auth?` + querystring.stringify({client_id: settings.canvas.clientId, response_type: 'code', redirect_uri: nextUrl})
     res.redirect(basicUrl)
   } catch (e) {
