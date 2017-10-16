@@ -64,7 +64,7 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
       kthid: student.sis_user_id,
       givenName: ugUser.givenName,
       surname: ugUser.sn,
-      personnummer: `"${ugUser.norEduPersonNIN}"`
+      personnummer: ugUser.norEduPersonNIN
     }
   }catch(err){
     log.error('An error occured while trying to find user in ldap:', err)
@@ -80,7 +80,7 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
     student.user_id || '',
     row['givenName'] || '',
     row['surname'] || '',
-    row['personnummer'] || ''
+    `"${row['personnummer'] || ''}"`
   ].concat(assignmentIds.map(id => row[id] || '-'))
 }
 //
