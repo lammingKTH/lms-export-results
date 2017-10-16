@@ -17,10 +17,10 @@ module.exports = {
   port: getEnv('SERVER_PORT', 3001),
 
   ldap:{
-    base:'ou=UG,dc=referens,dc=sys,dc=kth,dc=se',
-    url: getEnv('LDAP_URL', 'kth.test.instructure.com'),
-    userName: getEnv('LDAP_USERNAME', 'kth.test.instructure.com'),
-    password: getEnv('LDAP_PASSWORD', 'kth.test.instructure.com'),
+    base: getEnv('LDAP_BASE', 'ou=UG,dc=referens,dc=kth,dc=se'),
+    url: getEnv('LDAP_URL', 'ldaps://ldap.referens.sys.kth.se'),
+    userName: getEnv('LDAP_USERNAME', ''),
+    password: getEnv('LDAP_PASSWORD', ''),
   },
   canvas:{
     host: getEnv('CANVAS_HOST', 'kth.test.instructure.com'),
