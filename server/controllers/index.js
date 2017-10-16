@@ -80,7 +80,7 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
     student.user_id || '',
     row['givenName'] || '',
     row['surname'] || '',
-    `="${row['personnummer']}"` || ''
+    `="${row['personnummer'] || ''}"`
   ].concat(assignmentIds.map(id => row[id] || '-'))
 }
 //
@@ -119,7 +119,7 @@ async function exportResults3 (req, res) {
 
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
-    const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(id => headers[id]))
+    const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'Personnummer'].concat(assignmentIds.map(id => headers[id]))
 
     res.set({ 'content-type': 'text/csv; charset=utf-8' })
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
