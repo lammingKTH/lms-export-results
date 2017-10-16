@@ -17,7 +17,7 @@ module.exports = {
   port: getEnv('SERVER_PORT', 3001),
 
   ldap:{
-    base: getEnv('LDAP_BASE', 'ou=UG,dc=referens,dc=kth,dc=se'),
+    base: getEnv('LDAP_BASE', 'ou=UG,dc=referens,dc=sys.dc=kth,dc=se'),
     url: getEnv('LDAP_URL', 'ldaps://ldap.referens.sys.kth.se'),
     userName: getEnv('LDAP_USERNAME', ''),
     password: getEnv('LDAP_PASSWORD', ''),
