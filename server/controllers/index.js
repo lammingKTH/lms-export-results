@@ -123,6 +123,10 @@ async function exportResults3 (req, res) {
 
     res.set({ 'content-type': 'text/csv; charset=utf-8' })
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
+
+    // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
+    res.write('\uFEFF')
+
     res.write(csv.createLine(csvHeader))
     for (let student of students) {
       const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds})
