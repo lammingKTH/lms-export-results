@@ -18,15 +18,6 @@ module.exports = {
   robotsTxt: getRobotsTxt,
   paths: getPathsHandler,
   checkAPIKey: checkAPIKey,
-  swagger: getSwagger
-}
-
-/**
- * GET /swagger.json
- * Swagger config
- */
-function getSwagger (req, res) {
-  res.json(require('../../swagger.json'))
 }
 
 function getNameAndVersion () {
