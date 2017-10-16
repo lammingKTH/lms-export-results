@@ -7,8 +7,6 @@ const CanvasApi = require('kth-canvas-api')
 const csv = require('./csvFile')
 const ldap = require('./ldap')
 
-const Promise = require('bluebird')
-
 const canvasApiUrl = `https://${settings.canvas.host}/api/v1`
 
 function exportResults (req, res) {
@@ -122,9 +120,6 @@ async function exportResults3 (req, res) {
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
     const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'PersonNummer'].concat(assignmentIds.map(id => headers[id]))
-
-    log.info('TODO: remove this delay!!!!!')
-    await Promise.delay(30000)
 
     res.set({ 'content-type': 'text/csv; charset=utf-8' })
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
