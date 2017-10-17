@@ -12,6 +12,7 @@ const canvasApiUrl = `https://${settings.canvas.host}/api/v1`
 function exportResults (req, res) {
   try {
     let b = req.body
+    log.info(`The user ${b.lis_person_sourcedid}, ${b.custom_canvas_user_login_id}, is exporting the course ${b.context_label} with id ${b.custom_canvas_course_id}`)
     let courseRound = b.lis_course_offering_sourcedid
     const canvasCourseId = b.custom_canvas_course_id
     const fullUrl = (settings.proxyBase || (req.protocol + '://' + req.get('host'))) + req.originalUrl
