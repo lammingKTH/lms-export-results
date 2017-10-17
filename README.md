@@ -32,8 +32,8 @@ NAME="Exportera resultat REF"
 curl -X POST 'https://kth.test.instructure.com/api/v1/accounts/1/external_tools' \
      -H "Authorization: Bearer $CANVAS_TOKEN" \
      -F "name=$NAME" \
-     -F 'consumer_key=asdfg' \
-     -F 'shared_secret=lkjh' \
+     -F 'consumer_key=not_used' \
+     -F 'shared_secret=not_used' \
      -F "url=https://api-r.referens.sys.kth.se/api/lms-export-results/export" \
      -F 'privacy_level=public' \
      -F 'course_navigation[visibility]=admins' \
