@@ -49,6 +49,7 @@ function getAbout (req, res) {
  */
 async function getMonitor (req, res) {
   try {
+    aaaaaaaaaa()
     log.debug("Start preparing monitor")
     let checks = {
       // Async functions that we do not await: Promises?
