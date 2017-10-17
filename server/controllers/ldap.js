@@ -38,7 +38,6 @@ function getBoundClient () {
 
 function lookupUser (ldapClient, kthid) {
   return new Promise((resolve, reject) => {
-    log.info('Should try to search')
     ldapClient.search(
       settings.ldap.base,
       {
