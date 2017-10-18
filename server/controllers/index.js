@@ -129,10 +129,10 @@ async function exportResults3 (req, res) {
 
     // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
     res.write('\uFEFF')
-    students.forEach(student => {
-      student.canvasName = users.find()
-      // TODO: set the Canvas name for each student
-    })
+    // students.forEach(student => {
+    //   student.canvasName = users.find()
+    //   // TODO: set the Canvas name for each student
+    // })
     res.write(csv.createLine(csvHeader))
     for (let student of students) {
       log.info('stundent', student)
