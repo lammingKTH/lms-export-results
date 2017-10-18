@@ -118,8 +118,8 @@ async function exportResults3 (req, res) {
     const canvasApi = new CanvasApi(canvasApiUrl, accessToken)
     const students = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
 
-    const users = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
-    console.log('users: ', users)
+    // const users = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
+    // console.log('users: ', users)
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
     const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'Personnummer'].concat(assignmentIds.map(id => headers[id]))
@@ -130,10 +130,12 @@ async function exportResults3 (req, res) {
     // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
     res.write('\uFEFF')
     students.forEach(student => {
+      student.canvasName = users.find()
       // TODO: set the Canvas name for each student
     })
     res.write(csv.createLine(csvHeader))
     for (let student of students) {
+      log.info('stundent', student)
       const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds})
       res.write(csv.createLine(csvLine))
     }
