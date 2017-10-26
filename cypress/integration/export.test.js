@@ -13,7 +13,9 @@ function login () {
 describe('Export', () => {
   it('should download a csv file', () => {
     login()
-    cy.get('#global_nav_courses_link').click()
-    cy.get('.ic-NavMenu-list-item__link:first').click()
+
+    cy.visit('https://kth.test.instructure.com/courses/4858/external_tools/446?display=borderless')
+    cy.contains('Godkänn').click()
+    // cy.get('a').filter(el => el.val === 'kth Exportera resultat LOCALHOST').click()
   })
 })
