@@ -36,3 +36,5 @@ docker-compose*.yml
 
 # test coverage
 coverage
+
+cypress.json
