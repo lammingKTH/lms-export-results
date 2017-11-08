@@ -127,6 +127,9 @@ async function exportResults3 (req, res) {
     res.set({ 'content-type': 'text/csv; charset=utf-8' })
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
 
+    res.cookie('kth-export-results-number-of-students', students.length,  { maxAge:2000, httpOnly: false })
+    res.cookie('kth-export-results-number-of-columns', csvHeader.length,  { maxAge:2000, httpOnly: false })
+
     // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
     res.write('\uFEFF')
     // students.forEach(student => {
@@ -139,6 +142,7 @@ async function exportResults3 (req, res) {
       const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds})
       res.write(csv.createLine(csvLine))
     }
+    // res.cookie('kth-export-results-downloaded', true,  { maxAge:2000, httpOnly: true })
     res.send()
   } catch (e) {
     log.error('Export failed:', e)
