@@ -16,6 +16,8 @@ describe('Export', () => {
     // log.info(`The user ${b.lis_person_sourcedid}, ${b.custom_canvas_user_login_id}, is exporting the course ${b.context_label} with id ${b.custom_canvas_course_id}`)
     cy.visit('https://kth.test.instructure.com/courses/4/external_tools/489?display=borderless')
     cy.contains('Godkänn').click()
+    cy.getCookie('kth-export-results-number-of-students').should('have.property', 'value', '123')
+
     // The download should now start. But we need to verify that the file gets downloaded
 
   })

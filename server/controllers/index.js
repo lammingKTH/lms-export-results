@@ -92,6 +92,14 @@ function exportResults2 (req, res) {
     res.send(`
     Your download should start automatically. If nothing happens within a few minutes, please go back and try again.
     <script>
+    setInterval(function(){
+      var cookiesKeys = document.cookie.split(';').map(kv=>kv.split('=')[0])
+      var foundCookie = cookiesKeys.find(k => k === 'kth-export-results-number-of-students')
+      if(foundCookie){
+        console.log('found cookie!')
+        document.location='done'
+      }
+    },100)
     document.location='exportResults3${req._parsedUrl.search}'
     </script>
       `)
