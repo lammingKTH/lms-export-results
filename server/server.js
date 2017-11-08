@@ -27,7 +27,7 @@ server.use(cookieParser())
  */
 // const addPaths = require('kth-node-express-routing').addPaths
 const { notFoundHandler, errorHandler } = require('kth-node-api-common')
-const { System, exportResults, exportResults2, exportResults3 } = require('./controllers')
+const { System, exportResults, exportResults2, exportResults3, exportDone } = require('./controllers')
 
 // System pages routes
 const systemRoute = AppRouter()
@@ -42,6 +42,7 @@ server.get(config.proxyPrefixPath.uri, (req, res) => res.redirect(`${config.prox
 server.post(config.proxyPrefixPath.uri + '/export', exportResults)
 server.get(config.proxyPrefixPath.uri + '/export2', exportResults2)
 server.get(config.proxyPrefixPath.uri + '/exportResults3', exportResults3)
+server.get(config.proxyPrefixPath.uri + '/done', exportDone)
 
 // Temp route
 server.get(config.proxyPrefixPath.uri + '/test', (req, res) => res.send(`

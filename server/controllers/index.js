@@ -110,6 +110,10 @@ function exportResults2 (req, res) {
   }
 }
 
+function exportDone(req,res){
+  res.send('Done. The file should now be downloaded to your computer.')
+}
+
 async function exportResults3 (req, res) {
   try {
     const courseRound = req.query.courseRound
@@ -164,5 +168,6 @@ module.exports = {
 
   exportResults,
   exportResults2,
-  exportResults3
+  exportResults3,
+  exportDone
 }
