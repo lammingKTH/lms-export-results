@@ -92,15 +92,7 @@ function exportResults2 (req, res) {
     res.send(`
     Your download should start automatically. If nothing happens within a few minutes, please go back and try again.
     <script>
-    setInterval(function(){
-      var cookiesKeys = document.cookie.split(';').map(kv=>kv.split('=')[0])
-      var foundCookie = cookiesKeys.find(k => k === 'kth-export-results-number-of-students')
-      if(foundCookie){
-        console.log('found cookie!')
-        document.location='done'
-      }
-    },100)
-    document.location='exportResults3${req._parsedUrl.search}'
+      document.location='exportResults3${req._parsedUrl.search}'
     </script>
       `)
     // res.redirect('download' + req._parsedUrl.search)
@@ -139,22 +131,15 @@ async function exportResults3 (req, res) {
     res.set({ 'content-type': 'text/csv; charset=utf-8' })
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
 
-    res.cookie('kth-export-results-number-of-students', students.length,  { maxAge:2000000, httpOnly: false })
-    res.cookie('kth-export-results-number-of-columns', csvHeader.length,  { maxAge:2000000, httpOnly: false })
-
     // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
     res.write('\uFEFF')
-    // students.forEach(student => {
-    //   student.canvasName = users.find()
-    //   // TODO: set the Canvas name for each student
-    // })
+
     res.write(csv.createLine(csvHeader))
     for (let student of students) {
       log.info('stundent', student)
       const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds})
       res.write(csv.createLine(csvLine))
     }
-    // res.cookie('kth-export-results-downloaded', true,  { maxAge:2000, httpOnly: true })
     res.send()
   } catch (e) {
     log.error('Export failed:', e)

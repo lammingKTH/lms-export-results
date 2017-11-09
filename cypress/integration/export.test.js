@@ -12,16 +12,16 @@ function login () {
 
 describe('Export', () => {
   it('should download a csv file', () => {
+    Cypress.Cookies.debug(true)
     login()
     // log.info(`The user ${b.lis_person_sourcedid}, ${b.custom_canvas_user_login_id}, is exporting the course ${b.context_label} with id ${b.custom_canvas_course_id}`)
     cy.visit('https://kth.test.instructure.com/courses/4/external_tools/489?display=borderless')
     cy.contains('Godkänn').click()
-    cy.wait(15000)
-    cy.getCookies().then(c => console.log('cookies:', c))
 
-    cy.getCookie('kth-export-results-number-of-students', {timeout:90000}).then(c => console.log('cookie:', c))
-    cy.getCookie('kth-export-results-number-of-students', {timeout:90000}).should('have.property', 'value', '123')
+    cy.wait(5000)
+    // The file should be downloaded now. Check the ~/Downloads folder.
 
+    cy.exec('cypress/integration/check-downloaded-file.js')
     // The download should now start. But we need to verify that the file gets downloaded
 
   })
