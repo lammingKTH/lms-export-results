@@ -139,8 +139,8 @@ async function exportResults3 (req, res) {
     res.set({ 'content-type': 'text/csv; charset=utf-8' })
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
 
-    res.cookie('kth-export-results-number-of-students', students.length,  { maxAge:2000, httpOnly: false })
-    res.cookie('kth-export-results-number-of-columns', csvHeader.length,  { maxAge:2000, httpOnly: false })
+    res.cookie('kth-export-results-number-of-students', students.length,  { maxAge:20000, httpOnly: false })
+    res.cookie('kth-export-results-number-of-columns', csvHeader.length,  { maxAge:20000, httpOnly: false })
 
     // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
     res.write('\uFEFF')
