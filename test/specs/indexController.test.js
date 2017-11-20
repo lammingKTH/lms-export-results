@@ -14,3 +14,18 @@ test('should redirect to the Canvas authentication page', t => {
   t.equal(res.redirect.callCount, 1)
   t.end()
 })
+
+test('should send status:500 if exportResults breaks', t => {
+  const res = {status: sinon.stub().returns({
+    send(){}
+  })}
+  const req = {body: {}, get: () => {
+    throw new Error('Just pretending that something breaks...')
+  }}
+
+  exportResults(req, res)
+
+  t.equal(res.status.getCalls()[0].args[0], 500)
+
+  t.end()
+})
