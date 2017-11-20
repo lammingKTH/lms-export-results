@@ -7,9 +7,6 @@ const AppRouter = require('kth-node-express-routing').PageRouter
 // Expose the server and paths
 // server.locals.secret = new Map()
 module.exports = server
-// module.exports.getPaths = () => getPaths()
-//
-const log = require('./log')
 
 /* *******************************
  * ******* REQUEST PARSING *******

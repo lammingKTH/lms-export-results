@@ -17,7 +17,7 @@ module.exports = {
   about: getAbout,
   robotsTxt: getRobotsTxt,
   paths: getPathsHandler,
-  checkAPIKey: checkAPIKey,
+  checkAPIKey: checkAPIKey
 }
 
 function getNameAndVersion () {
@@ -43,14 +43,13 @@ function getAbout (req, res) {
 `)
 }
 
-
 /**
  * GET /_monitor
  * Monitor page
  */
 async function getMonitor (req, res) {
   try {
-    log.debug("Start preparing monitor")
+    log.debug('Start preparing monitor')
     let checks = {
       // Async functions that we do not await: Promises?
       'LDAP': checkLdap(),
@@ -62,14 +61,14 @@ async function getMonitor (req, res) {
     }
     let body = ''
 
-    log.debug("Start collecting monitor results")
+    log.debug('Start collecting monitor results')
     for (let key in checks) {
       const status = await getStatus(checks[key])
       body = body + statusRow(key, status)
       main.ok &= status.ok
     }
 
-    log.info("Done collecting monitor results", main)
+    log.info('Done collecting monitor results', main)
     res.type('text').status(200).send(statusRow('APPLICATION_STATUS', main) + body)
   } catch (err) {
     log.error('Failed to display status page:', err)

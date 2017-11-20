@@ -21,6 +21,5 @@ describe('Export', () => {
 
     // cy.exec('node cypress/integration/check-downloaded-file.js')
     // The download should now start. But we need to verify that the file gets downloaded
-
   })
 })

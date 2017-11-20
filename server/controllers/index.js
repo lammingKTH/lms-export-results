@@ -59,7 +59,7 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
 
 async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
   let row
-  try{
+  try {
     const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
     row = {
       kthid: student.sis_user_id,
@@ -67,7 +67,7 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
       surname: ugUser.sn,
       personnummer: ugUser.norEduPersonNIN
     }
-  }catch(err){
+  } catch (err) {
     log.error('An error occured while trying to find user in ldap:', err)
     log.info('No user from ldap, use empty row instead')
     row = {}
@@ -127,7 +127,7 @@ function exportResults2 (req, res) {
   }
 }
 
-function exportDone(req,res){
+function exportDone (req, res) {
   res.send('Done. The file should now be downloaded to your computer.')
 }
 
@@ -154,8 +154,8 @@ async function exportResults3 (req, res) {
     const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'Personnummer'].concat(assignmentIds.map(id => headers[id]))
 
     res.set({
-      'content-type': 'text/csv; charset=utf-8' ,
-      'location':'http://www.kth.se'
+      'content-type': 'text/csv; charset=utf-8',
+      'location': 'http://www.kth.se'
     })
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
 

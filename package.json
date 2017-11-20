@@ -13,6 +13,12 @@
   "pre-push": [
     "test"
   ],
+  "standard": {
+    "ignore": [
+      "**/cypress/",
+      "**/test/"
+    ]
+  },
   "dependencies": {
     "bluebird": "^3.5.0",
     "body-parser": "^1.15.2",

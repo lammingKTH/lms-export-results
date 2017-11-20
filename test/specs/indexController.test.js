@@ -7,7 +7,7 @@ const exportResults = indexController.__get__('exportResults')
 
 test('should redirect to the Canvas authentication page', t => {
   const res = {redirect: sinon.spy()}
-  const req =  {body:{}, get:()=>''}
+  const req = {body: {}, get: () => ''}
 
   exportResults(req, res)
 

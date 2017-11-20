@@ -9,7 +9,7 @@ function escapeCsvData (str) {
 }
 
 module.exports = {
-  createLine(strArr){
-      return strArr.map(escapeCsvData).join(';') + '\n'
+  createLine (strArr) {
+    return strArr.map(escapeCsvData).join(';') + '\n'
   }
 }
