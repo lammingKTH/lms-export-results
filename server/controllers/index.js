@@ -93,30 +93,31 @@ function exportResults2 (req, res) {
   Your download should start automatically. If nothing happens within a few minutes, please go back and try again.
 
   <script>
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'exportResults3${req._parsedUrl.search}', true);
-    xhr.responseType = 'blob';
-
-    xhr.onload = function(e) {
-      if (this.status == 200) {
-        // Note: .response instead of .responseText
-        var a = document.createElement('a')
-        document.body.appendChild(a)
-        a.style = 'display: none'
-
-        var blob = new Blob([this.response], {type: 'text/csv'});
-        console.log('wow, got the file! Now: save it')
-
-        url = window.URL.createObjectURL(blob)
-        a.href = url
-        a.download = 'canvas-results.csv'
-        a.click()
-        window.URL.revokeObjectURL(url)
-        document.location='done'
-      }
-    };
-
-    xhr.send();
+    // var xhr = new XMLHttpRequest();
+    // xhr.open('GET', 'exportResults3${req._parsedUrl.search}', true);
+    // xhr.responseType = 'blob';
+    //
+    // xhr.onload = function(e) {
+    //   if (this.status == 200) {
+    //     // Note: .response instead of .responseText
+    //     var a = document.createElement('a')
+    //     document.body.appendChild(a)
+    //     a.style = 'display: none'
+    //
+    //     var blob = new Blob([this.response], {type: 'text/csv'});
+    //     console.log('wow, got the file! Now: save it')
+    //
+    //     url = window.URL.createObjectURL(blob)
+    //     a.href = url
+    //     a.download = 'canvas-results.csv'
+    //     a.click()
+    //     window.URL.revokeObjectURL(url)
+    //     document.location='done'
+    //   }
+    // };
+    //
+    // xhr.send();
+    document.location='exportResults3${req._parsedUrl.search}'
   </script>
       `)
     // res.redirect('download' + req._parsedUrl.search)
@@ -152,7 +153,10 @@ async function exportResults3 (req, res) {
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
     const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'Personnummer'].concat(assignmentIds.map(id => headers[id]))
 
-    res.set({ 'content-type': 'text/csv; charset=utf-8' })
+    res.set({
+      'content-type': 'text/csv; charset=utf-8' ,
+      'location':'http://www.kth.se'
+    })
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
 
     // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
@@ -166,7 +170,7 @@ async function exportResults3 (req, res) {
     }
     res.send()
   } catch (e) {
-    log.error('Export failed:', e)
+    log.error(`Export failed for query ${req.query}:`, e)
     res.status(500).send('Trasigt')
   }
 }
