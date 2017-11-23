@@ -86,46 +86,21 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
 }
 //
 function exportResults2 (req, res) {
-  res.sendFile(path.join(__dirname+'/export2.html'));
-  // try {
-  //   // Hack to make Canvas see that the auth is finished and the
-  //   // 'please wait' text can be removed
-  //   res.send(`
-  // Your download should start automatically. If nothing happens within a few minutes, please go back and try again.
-  //
-  // <script>
-  //   // var xhr = new XMLHttpRequest();
-  //   // xhr.open('GET', 'exportResults3${req._parsedUrl.search}', true);
-  //   // xhr.responseType = 'blob';
-  //   //
-  //   // xhr.onload = function(e) {
-  //   //   if (this.status == 200) {
-  //   //     // Note: .response instead of .responseText
-  //   //     var a = document.createElement('a')
-  //   //     document.body.appendChild(a)
-  //   //     a.style = 'display: none'
-  //   //
-  //   //     var blob = new Blob([this.response], {type: 'text/csv'});
-  //   //     console.log('wow, got the file! Now: save it')
-  //   //
-  //   //     url = window.URL.createObjectURL(blob)
-  //   //     a.href = url
-  //   //     a.download = 'canvas-results.csv'
-  //   //     a.click()
-  //   //     window.URL.revokeObjectURL(url)
-  //   //     document.location='done'
-  //   //   }
-  //   // };
-  //   //
-  //   // xhr.send();
-  //   document.location='exportResults3${req._parsedUrl.search}'
-  // </script>
-  //     `)
-  //   // res.redirect('download' + req._parsedUrl.search)
-  // } catch (e) {
-  //   log.error('Export failed:', e)
-  //   res.status(500).send('Trasigt')
-  // }
+  try {
+    // Hack to make Canvas see that the auth is finished and the
+    // 'please wait' text can be removed
+    res.send(`
+  Your download should start automatically. If nothing happens within a few minutes, please go back and try again.
+
+  <script>
+    document.location='exportResults3${req._parsedUrl.search}'
+  </script>
+      `)
+    // res.redirect('download' + req._parsedUrl.search)
+  } catch (e) {
+    log.error('Export failed:', e)
+    res.status(500).send('Trasigt')
+  }
 }
 
 function exportDone (req, res) {
