@@ -24,7 +24,7 @@ server.use(cookieParser())
  * **********************************
  */
 
-const { System, exportResults, exportResults2, exportResults3, exportDone } = require('./controllers')
+const { System, exportResults, exportResults2, exportResults3, exportDone } = require('./controllers/export')
 
 // System pages routes
 const systemRoute = AppRouter()
