@@ -147,7 +147,27 @@ async function exportResults3 (req, res) {
     res.send()
   } catch (e) {
     log.error(`Export failed for query ${req.query}:`, e)
-    res.status(500).send('Trasigt')
+    res.status(500).send(`
+      <html>
+      <head>
+      <link rel="stylesheet" href="http://kth.se/social/static/compressed/css/a133edfba1b3.css" type="text/css" media="all">
+      </head>
+      <div class="error-message alert" role="alert">
+               <span class="message">
+                   <p>
+
+                        <b>Åh nej, något gick fel! </b>
+                   </p>
+                   <p>
+                    Försök gärna igen, så håller vi tummarna att det går bättre nästa gång...
+                  </p>
+                  <p>Fel:</p>
+                  <code>${e.message}</code>
+
+               </span>
+        </div>
+      </html>
+      `)
   }
 }
 
