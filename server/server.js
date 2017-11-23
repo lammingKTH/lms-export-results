@@ -24,22 +24,21 @@ server.use(cookieParser())
  * **********************************
  */
 
-const { System, exportResults, exportResults2, exportResults3, exportDone } = require('./controllers/export')
+const { exportResults, exportResults2, exportResults3, exportDone } = require('./export')
+const {monitor, about, paths, robotsTxt} = require('./controllers/systemCtrl')
+const prefix = config.proxyPrefixPath.uri
 
-// System pages routes
-const systemRoute = AppRouter()
-systemRoute.get('system.monitor', config.proxyPrefixPath.uri + '/_monitor', System.monitor)
-systemRoute.get('system.about', config.proxyPrefixPath.uri + '/_about', System.about)
-systemRoute.get('system.paths', config.proxyPrefixPath.uri + '/_paths', System.paths)
-systemRoute.get('system.robots', '/robots.txt', System.robotsTxt)
+server.get(prefix + '/_monitor', monitor)
+server.get(prefix + '/_about', about)
+server.get(prefix + '/_paths', paths)
+server.get('/robots.txt', robotsTxt)
 
-server.use('/', systemRoute.getRouter())
-server.get(config.proxyPrefixPath.uri, (req, res) => res.redirect(`${config.proxyPrefixPath.uri}/_about`))
-console.log('......................', config.proxyPrefixPath.uri + '/export')
-server.post(config.proxyPrefixPath.uri + '/export', exportResults)
-server.get(config.proxyPrefixPath.uri + '/export2', exportResults2)
-server.get(config.proxyPrefixPath.uri + '/exportResults3', exportResults3)
-server.get(config.proxyPrefixPath.uri + '/done', exportDone)
+server.get(prefix, (req, res) => res.redirect(`${config.proxyPrefixPath.uri}/_about`))
+
+server.post(prefix + '/export', exportResults)
+server.get(prefix + '/export2', exportResults2)
+server.get(prefix + '/exportResults3', exportResults3)
+server.get(prefix + '/done', exportDone)
 
 // Temp route
 server.get(config.proxyPrefixPath.uri + '/test', (req, res) => res.send(`

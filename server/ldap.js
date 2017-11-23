@@ -1,7 +1,6 @@
-const log = require('../log')
-const Promise = require('bluebird')
+const log = require('./log')
 const ldap = require('ldapjs')
-const settings = require('../../config/serverSettings')
+const settings = require('../config/serverSettings')
 function getBoundClient () {
   return new Promise((resolve, reject) => {
     const options = {

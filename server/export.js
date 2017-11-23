@@ -1,8 +1,8 @@
 'use strict'
-const log = require('../log')
+const log = require('./log')
 const querystring = require('querystring')
 const rp = require('request-promise')
-const settings = require('../configuration').server
+const settings = require('./configuration').server
 const CanvasApi = require('kth-canvas-api')
 const csv = require('./csvFile')
 const ldap = require('./ldap')
@@ -153,7 +153,7 @@ async function exportResults3 (req, res) {
 
 module.exports = {
   // Do not remove the System controller!
-  System: require('./systemCtrl'),
+  // System: require('./controllers/systemCtrl'),
 
   exportResults,
   exportResults2,

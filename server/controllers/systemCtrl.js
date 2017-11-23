@@ -4,7 +4,7 @@ const log = require('../log')
 const packageFile = require('../../package.json')
 const getPaths = require('kth-node-express-routing').getPaths
 const settings = require('../configuration').server
-const ldap = require('./ldap')
+const ldap = require('../ldap')
 const rp = require('request-promise')
 const version = require('../../config/version')
 
@@ -38,7 +38,7 @@ function getAbout (req, res) {
 <p>${packageFile.description}</p>
 <p>Canvas is ${settings.canvas.host}</p>
 <p>Build on ${version.jenkinsBuildDate} from git ${version.gitCommit}.</p>
-<p><a href="${paths.system.monitor.uri}">system status</a></p>
+<p><a href="_monitor">system status</a></p>
 </body></html>
 `)
 }
