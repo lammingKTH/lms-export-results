@@ -18,12 +18,12 @@ server.use(bodyParser.json())
 server.use(bodyParser.urlencoded({ extended: true }))
 server.use(cookieParser())
 
+
 /* **********************************
  * ******* APPLICATION ROUTES *******
  * **********************************
  */
-// const addPaths = require('kth-node-express-routing').addPaths
-const { notFoundHandler, errorHandler } = require('kth-node-api-common')
+
 const { System, exportResults, exportResults2, exportResults3, exportDone } = require('./controllers')
 
 // System pages routes
@@ -35,7 +35,7 @@ systemRoute.get('system.robots', '/robots.txt', System.robotsTxt)
 
 server.use('/', systemRoute.getRouter())
 server.get(config.proxyPrefixPath.uri, (req, res) => res.redirect(`${config.proxyPrefixPath.uri}/_about`))
-
+console.log('......................', config.proxyPrefixPath.uri + '/export')
 server.post(config.proxyPrefixPath.uri + '/export', exportResults)
 server.get(config.proxyPrefixPath.uri + '/export2', exportResults2)
 server.get(config.proxyPrefixPath.uri + '/exportResults3', exportResults3)
@@ -52,7 +52,6 @@ server.get(config.proxyPrefixPath.uri + '/test', (req, res) => res.send(`
   `))
 
 // Catch not found and errors
-server.use(notFoundHandler)
-server.use(errorHandler)
+
 
 module.exports = server
