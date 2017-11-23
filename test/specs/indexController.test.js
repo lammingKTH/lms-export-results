@@ -2,8 +2,8 @@ const test = require('tape')
 const rewire = require('rewire')
 const sinon = require('sinon')
 
-const indexController = rewire('../../server/controllers')
-const exportResults = indexController.__get__('exportResults')
+const exportController = rewire('../../server/controllers/export')
+const exportResults = exportController.__get__('exportResults')
 
 test('should redirect to the Canvas authentication page', t => {
   const res = {redirect: sinon.spy()}
