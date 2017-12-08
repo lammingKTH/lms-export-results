@@ -1,8 +1,8 @@
 const test = require('tape')
 const rewire = require('rewire')
 const sinon = require('sinon')
-
-const _export = rewire('../../server/export')
+require('rewire-global').enable()
+const _export = require('../../server/export')
 const exportResults = _export.__get__('exportResults')
 const exportResults3 = _export.__get__('exportResults3')
 
@@ -31,9 +31,16 @@ test('should send status:500 if exportResults breaks', t => {
   t.end()
 })
 
-test.only('should write a file', t => {
+test.only('should write a file, given that canvas returns some submissions and ldap returns user data', t => {
   const res = {redirect: sinon.spy()}
   const req = {query: {courseRound: 'round', canvasCourseId: 'canvasCourseId'}, get: () => ''}
+
+  _export.__set__('getAccessToken', () => 'mocked token')
+
+  const CanvasApi = _export.__get__('CanvasApi')
+  CanvasApi.requestCanvas = () => {
+    console.log('öööööööööööööööö')
+  }
 
   exportResults3(req, res)
 
