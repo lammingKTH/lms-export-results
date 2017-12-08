@@ -63,3 +63,8 @@ test(`should write a file
   sinon.assert.calledWith(res.write, sinon.match('SIS User ID;ID;Section;Name;Surname;Personnummer'))
   t.end()
 })
+
+test.skip(`should write a file
+    with personnummer and name for the student
+    if canvas returns one assignment with one submission`, async t => {
+})
