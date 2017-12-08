@@ -2,7 +2,18 @@ const test = require('tape')
 const rewire = require('rewire')
 const sinon = require('sinon')
 require('rewire-global').enable()
-const _export = require('../../server/export')
+const proxyquire = require('proxyquire')
+
+class CanvasApi {
+  requestUrl (url) {
+    console.log(':) requesting canvas:', url)
+  }
+  recursePages () {
+    console.log(':) recursing canvas:')
+  }
+}
+
+const _export = proxyquire('../../server/export', {'kth-canvas-api': CanvasApi})
 const exportResults = _export.__get__('exportResults')
 const exportResults3 = _export.__get__('exportResults3')
 

@@ -126,13 +126,13 @@ async function exportResults3 (req, res) {
     })
 
     const canvasApi = new CanvasApi(canvasApiUrl, accessToken)
-    const students = await canvasApi.requestCanvas(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
+    const students = await canvasApi.requestUrl(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
 
     // const users = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
     // console.log('users: ', users)
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
-    const csvHeader = ['SIS User ID', 'ID', 'Section','Name', 'Surname', 'Personnummer'].concat(assignmentIds.map(id => headers[id]))
+    const csvHeader = ['SIS User ID', 'ID', 'Section', 'Name', 'Surname', 'Personnummer'].concat(assignmentIds.map(id => headers[id]))
 
     res.set({
       'content-type': 'text/csv; charset=utf-8',
