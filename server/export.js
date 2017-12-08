@@ -60,7 +60,8 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
 async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
   let row
   try {
-    const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
+    // const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
+    const ugUser = {givenName: 'mock', sn: 'Mock', norEduPersonNIN: '12121212'}
     row = {
       kthid: student.sis_user_id,
       givenName: ugUser.givenName,
@@ -109,10 +110,13 @@ function exportDone (req, res) {
 
 async function exportResults3 (req, res) {
   try {
+    const fetchedSections = {}
+
     const courseRound = req.query.courseRound
     const canvasCourseId = req.query.canvasCourseId
     log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
-    const ldapClient = await ldap.getBoundClient()
+    // const ldapClient = await ldap.getBoundClient()
+    const ldapClient = {}
     const accessToken = await getAccessToken({
       clientId: settings.canvas.clientId,
       clientSecret: settings.canvas.clientSecret,
@@ -139,8 +143,12 @@ async function exportResults3 (req, res) {
     res.write('\uFEFF')
 
     res.write(csv.createLine(csvHeader))
+
     for (let student of students) {
-      log.info('stundent', student)
+      // log.info('student', student)
+      const section = fetchedSections[student.section_id] || await canvasApi.requestCanvas(`sections/${student.section_id}`)
+      fetchedSections[student.section_id] = section
+      log.info('fetched section:', section)
       const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds})
       res.write(csv.createLine(csvLine))
     }
@@ -150,7 +158,7 @@ async function exportResults3 (req, res) {
     res.status(500).send(`
       <html>
       <head>
-      <link rel="stylesheet" href="http://kth.se/social/static/compressed/css/a133edfba1b3.css" type="text/css" media="all">
+      <link rel="stylesheet" href="todo:add correct url here" type="text/css" media="all">
       </head>
       <div class="error-message alert" role="alert">
                <span class="message">
