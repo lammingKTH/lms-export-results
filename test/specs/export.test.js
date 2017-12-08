@@ -44,22 +44,22 @@ test('should send status:500 if exportResults breaks', t => {
   t.end()
 })
 
-test.only(`
-  should write a file
-    given that canvas returns some submissions
-    and ldap returns user data`, t => {
+test(`should write a file
+    with BOM and headlines
+    if canvas don't return any submissions`, async t => {
   const res = {
     set: sinon.spy(),
     attachment: sinon.spy(),
     write: sinon.spy(),
-    send(){}
+    send () {}
   }
   const req = {query: {courseRound: 'round', canvasCourseId: 'canvasCourseId'}, get: () => ''}
 
   _export.__set__('getAccessToken', () => 'mocked token')
 
-  exportResults3(req, res)
+  await exportResults3(req, res)
 
-  // t.equal(res.redirect.callCount, 1)
+  sinon.assert.calledWith(res.write, '\uFEFF')
+  sinon.assert.calledWith(res.write, sinon.match('SIS User ID;ID;Section;Name;Surname;Personnummer'))
   t.end()
 })

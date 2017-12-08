@@ -8,6 +8,7 @@ const csv = require('./csvFile')
 const ldap = require('./ldap')
 
 const canvasApiUrl = `https://${settings.canvas.host}/api/v1`
+const csvHeader = ['SIS User ID', 'ID', 'Section', 'Name', 'Surname', 'Personnummer']
 
 function exportResults (req, res) {
   try {
@@ -98,7 +99,6 @@ function exportResults2 (req, res) {
     document.location='exportResults3${req._parsedUrl.search}'
   </script>
       `)
-    // res.redirect('download' + req._parsedUrl.search)
   } catch (e) {
     log.error('Export failed:', e)
     res.status(500).send('Trasigt')
@@ -128,11 +128,10 @@ async function exportResults3 (req, res) {
     const canvasApi = new CanvasApi(canvasApiUrl, accessToken)
     const students = await canvasApi.requestUrl(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
 
-    // const users = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
-    // console.log('users: ', users)
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
-    const csvHeader = ['SIS User ID', 'ID', 'Section', 'Name', 'Surname', 'Personnummer'].concat(assignmentIds.map(id => headers[id]))
+
+    csvHeader.concat(assignmentIds.map(id => headers[id]))
 
     res.set({
       'content-type': 'text/csv; charset=utf-8',
@@ -142,7 +141,6 @@ async function exportResults3 (req, res) {
 
     // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
     res.write('\uFEFF')
-
     res.write(csv.createLine(csvHeader))
 
     for (let student of students) {
