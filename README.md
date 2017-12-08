@@ -28,13 +28,13 @@ LDAP_PASSWORD
 
 #### Add an external tool
 ```
-NAME="Exportera resultat REF"
+NAME="Exportera resultat"
 curl -X POST 'https://kth.test.instructure.com/api/v1/accounts/1/external_tools' \
      -H "Authorization: Bearer $CANVAS_TOKEN" \
      -F "name=$NAME" \
      -F 'consumer_key=not_used' \
      -F 'shared_secret=not_used' \
-     -F "url=https://api-r.referens.sys.kth.se/api/lms-export-results/export" \
+     -F "url=http://localhost:3001/api/lms-export-results/export" \
      -F 'privacy_level=public' \
      -F 'course_navigation[visibility]=admins' \
      -F 'course_navigation[windowTarget]=_blank' \
@@ -44,8 +44,8 @@ curl -X POST 'https://kth.test.instructure.com/api/v1/accounts/1/external_tools'
      -F 'course_navigation[enabled]=true'
 ```
 #### Create a developer key
-- https://kth.beta.instructure.com/accounts/1/developer_keys
-- Enter 'Omdirigera URI (ark):' $HOST/api/lms-export-results/export2
+- https://kth.test.instructure.com/accounts/1/developer_keys
+- Enter 'Omdirigera URI (ark):' http://localhost:3001/api/lms-export-results/export2
 - Copy id and key and paste these into the .env file.
 #### Testing
 
