@@ -57,7 +57,7 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
   return {assignmentIds, headers}
 }
 
-async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
+async function createSubmissionLine ({student, ldapClient, assignmentIds, section}) {
   let row
   try {
     // const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
@@ -80,9 +80,10 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds}) {
   return [
     student.sis_user_id || '',
     student.user_id || '',
-    row['givenName'] || '',
-    row['surname'] || '',
-    `="${row['personnummer'] || ''}"`
+    section.name || '',
+    row.givenName || '',
+    row.surname || '',
+    `="${row.personnummer || ''}"`
   ].concat(assignmentIds.map(id => row[id] || '-'))
 }
 //
@@ -131,7 +132,7 @@ async function exportResults3 (req, res) {
     // console.log('users: ', users)
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
-    const csvHeader = ['SIS User ID', 'ID', 'Name', 'Surname', 'Personnummer'].concat(assignmentIds.map(id => headers[id]))
+    const csvHeader = ['SIS User ID', 'ID', 'Section','Name', 'Surname', 'Personnummer'].concat(assignmentIds.map(id => headers[id]))
 
     res.set({
       'content-type': 'text/csv; charset=utf-8',
@@ -148,8 +149,9 @@ async function exportResults3 (req, res) {
       // log.info('student', student)
       const section = fetchedSections[student.section_id] || await canvasApi.requestCanvas(`sections/${student.section_id}`)
       fetchedSections[student.section_id] = section
+
       log.info('fetched section:', section)
-      const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds})
+      const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds, section})
       res.write(csv.createLine(csvLine))
     }
     res.send()
