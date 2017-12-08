@@ -46,7 +46,7 @@ test('should send status:500 if exportResults breaks', t => {
 
 test(`should write a file
     with BOM and headlines
-    if canvas don't return any submissions`, async t => {
+    if there's no assignments in the course`, async t => {
   const res = {
     set: sinon.spy(),
     attachment: sinon.spy(),
@@ -66,5 +66,5 @@ test(`should write a file
 
 test.skip(`should write a file
     with personnummer and name for the student
-    if canvas returns one assignment with one submission`, async t => {
+    if there's one assignment with one submission in the course`, async t => {
 })
