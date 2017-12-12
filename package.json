@@ -5,7 +5,6 @@
   "main": "app.js",
   "private": true,
   "scripts": {
-    "codecheck": "standard",
     "test": "tape \"test/specs/*.test.js\" | tap-spec",
     "start": "NODE_ENV=production node app.js",
     "start-dev": "NODE_ENV=development nodemon app.js"
@@ -41,7 +40,6 @@
   "devDependencies": {
     "cypress": "^1.0.2",
     "nodemon": "^1.10.0",
-    "pre-push": "^0.1.1",
     "proxyquire": "^1.8.0",
     "rewire": "^2.5.2",
     "rewire-global": "^1.0.11",
