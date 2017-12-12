@@ -10,9 +10,6 @@
     "start": "NODE_ENV=production node app.js",
     "start-dev": "NODE_ENV=development nodemon app.js"
   },
-  "pre-push": [
-    "test"
-  ],
   "standard": {
     "ignore": [
       "**/cypress/",
