@@ -61,7 +61,7 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
 async function createSubmissionLine ({student, ldapClient, assignmentIds, section, canvasUser}) {
   let row
   try {
-    const ugUser = await ldap.lookupUser(ldapClient, student.login_id)
+    const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
     console.log('ugUser:', ugUser)
     // const ugUser = {givenName: 'mock', sn: 'Mock', norEduPersonNIN: '12121212'}
     row = {
@@ -111,11 +111,16 @@ function exportDone (req, res) {
   res.send('Done. The file should now be downloaded to your computer.')
 }
 
-async function curriedIsFake(canvasApi, canvasCourseId){
-  const gradebleStudents = await canvasApi.requestUrl(`courses/${canvasCourseId}/assignments/gradeable_students`)
+async function curriedIsFake ({canvasApi, canvasCourseId, assignmentIds}) {
+  // Get a list of the gradeble students for the first assignment.
+  // The only reason for this is to get the fake_student info for the students
+  const gradebleStudents = await canvasApi.requestUrl(`courses/${canvasCourseId}/assignments/gradeable_students?assignment_ids[]=${assignmentIds[0]}`)
+  log.info('gradebleStudents', gradebleStudents)
   const fakeStudents = gradebleStudents.filter(student => student.fake_student)
   return function (student) {
-      return false
+    log.info('fake students', fakeStudents)
+    log.info('student', student)
+    return fakeStudents.find(fake => fake.id === student.user_id)
   }
 }
 
@@ -152,13 +157,12 @@ async function exportResults3 (req, res) {
     res.write('\uFEFF')
     res.write(csv.createLine(csvHeader))
 
-    const isFake = await curriedIsFake(canvasApi,canvasCourseId)
+    const isFake = await curriedIsFake({canvasApi, canvasCourseId, assignmentIds})
 
     for (let student of students) {
-      log.info('student:', student)
-      // if(isFake(student)){
-      //   continue
-      // }
+      if (isFake(student)) {
+        continue
+      }
       const section = fetchedSections[student.section_id] || await canvasApi.requestCanvas(`sections/${student.section_id}`)
       fetchedSections[student.section_id] = section
 
