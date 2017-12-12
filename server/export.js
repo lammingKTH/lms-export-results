@@ -8,7 +8,7 @@ const csv = require('./csvFile')
 const ldap = require('./ldap')
 
 const canvasApiUrl = `https://${settings.canvas.host}/api/v1`
-const csvHeader = ['SIS User ID', 'ID', 'Section', 'Name', 'Surname', 'Personnummer']
+const csvHeader = ['SIS User ID', 'ID', 'Section', 'Name', 'Surname', 'Personnummer', 'Email address']
 
 function exportResults (req, res) {
   try {
@@ -58,11 +58,12 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
   return {assignmentIds, headers}
 }
 
-async function createSubmissionLine ({student, ldapClient, assignmentIds, section}) {
+async function createSubmissionLine ({student, ldapClient, assignmentIds, section, canvasUser}) {
   let row
   try {
-    // const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
-    const ugUser = {givenName: 'mock', sn: 'Mock', norEduPersonNIN: '12121212'}
+    const ugUser = await ldap.lookupUser(ldapClient, student.login_id)
+    console.log('ugUser:', ugUser)
+    // const ugUser = {givenName: 'mock', sn: 'Mock', norEduPersonNIN: '12121212'}
     row = {
       kthid: student.sis_user_id,
       givenName: ugUser.givenName,
@@ -84,7 +85,8 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds, sectio
     section.name || '',
     row.givenName || '',
     row.surname || '',
-    `="${row.personnummer || ''}"`
+    `="${row.personnummer || ''}"`,
+    ''
   ].concat(assignmentIds.map(id => row[id] || '-'))
 }
 //
@@ -109,6 +111,14 @@ function exportDone (req, res) {
   res.send('Done. The file should now be downloaded to your computer.')
 }
 
+async function curriedIsFake(canvasApi, canvasCourseId){
+  const gradebleStudents = await canvasApi.requestUrl(`courses/${canvasCourseId}/assignments/gradeable_students`)
+  const fakeStudents = gradebleStudents.filter(student => student.fake_student)
+  return function (student) {
+      return false
+  }
+}
+
 async function exportResults3 (req, res) {
   try {
     const fetchedSections = {}
@@ -116,8 +126,8 @@ async function exportResults3 (req, res) {
     const courseRound = req.query.courseRound
     const canvasCourseId = req.query.canvasCourseId
     log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
-    // const ldapClient = await ldap.getBoundClient()
-    const ldapClient = {}
+    const ldapClient = await ldap.getBoundClient()
+    // const ldapClient = {}
     const accessToken = await getAccessToken({
       clientId: settings.canvas.clientId,
       clientSecret: settings.canvas.clientSecret,
@@ -130,7 +140,6 @@ async function exportResults3 (req, res) {
 
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
-
     csvHeader.concat(assignmentIds.map(id => headers[id]))
 
     res.set({
@@ -143,12 +152,19 @@ async function exportResults3 (req, res) {
     res.write('\uFEFF')
     res.write(csv.createLine(csvHeader))
 
+    const isFake = await curriedIsFake(canvasApi,canvasCourseId)
+
     for (let student of students) {
-      // log.info('student', student)
+      log.info('student:', student)
+      // if(isFake(student)){
+      //   continue
+      // }
       const section = fetchedSections[student.section_id] || await canvasApi.requestCanvas(`sections/${student.section_id}`)
       fetchedSections[student.section_id] = section
 
-      log.info('fetched section:', section)
+      // Instead of embedding users into the massive submissions response, do another query to get user data
+      // const canvasUser = await canvasApi.requestUrl(`users/${student.user_id}`)
+      // log.info('canvasUser:', canvasUser)
       const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds, section})
       res.write(csv.createLine(csvLine))
     }
