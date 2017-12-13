@@ -15,7 +15,13 @@ class CanvasApi {
   }
 }
 
-const _export = proxyquire('../../server/export', {'kth-canvas-api': CanvasApi})
+const _export = proxyquire('../../server/export', {
+  'kth-canvas-api': CanvasApi,
+  './ldap': {getBoundClient () {
+    console.log('mocking ldap client')
+    return {}
+  }}
+})
 const exportResults = _export.__get__('exportResults')
 const exportResults3 = _export.__get__('exportResults3')
 
@@ -44,7 +50,7 @@ test('should send status:500 if exportResults breaks', t => {
   t.end()
 })
 
-test(`should write a file
+test.only(`should write a file
     with BOM and headlines
     if there's no assignments in the course`, async t => {
   const res = {
@@ -56,9 +62,10 @@ test(`should write a file
   const req = {query: {courseRound: 'round', canvasCourseId: 'canvasCourseId'}, get: () => ''}
 
   _export.__set__('getAccessToken', () => 'mocked token')
-
+  _export.__set__('curriedIsFake', () => () => {
+    return false
+  })
   await exportResults3(req, res)
-
   sinon.assert.calledWith(res.write, '\uFEFF')
   sinon.assert.calledWith(res.write, sinon.match('SIS User ID;ID;Section;Name;Surname;Personnummer'))
   t.end()

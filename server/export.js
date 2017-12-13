@@ -132,7 +132,7 @@ async function exportResults3 (req, res) {
     const canvasCourseId = req.query.canvasCourseId
     log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
     const ldapClient = await ldap.getBoundClient()
-    // const ldapClient = {}
+
     const accessToken = await getAccessToken({
       clientId: settings.canvas.clientId,
       clientSecret: settings.canvas.clientSecret,
@@ -158,11 +158,11 @@ async function exportResults3 (req, res) {
     res.write(csv.createLine(csvHeader))
 
     const isFake = await curriedIsFake({canvasApi, canvasCourseId, assignmentIds})
-
     for (let student of students) {
       if (isFake(student)) {
         continue
       }
+      console.log('fetch section...')
       const section = fetchedSections[student.section_id] || await canvasApi.requestCanvas(`sections/${student.section_id}`)
       fetchedSections[student.section_id] = section
 
