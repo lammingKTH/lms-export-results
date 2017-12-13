@@ -86,7 +86,7 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds, sectio
     row.givenName || '',
     row.surname || '',
     `="${row.personnummer || ''}"`,
-    ''
+    canvasUser.login_id || ''
   ].concat(assignmentIds.map(id => row[id] || '-'))
 }
 //
@@ -114,12 +114,11 @@ function exportDone (req, res) {
 async function curriedIsFake ({canvasApi, canvasCourseId, assignmentIds}) {
   // Get a list of the gradeble students for the first assignment.
   // The only reason for this is to get the fake_student info for the students
-  const gradebleStudents = await canvasApi.requestUrl(`courses/${canvasCourseId}/assignments/gradeable_students?assignment_ids[]=${assignmentIds[0]}`)
-  log.info('gradebleStudents', gradebleStudents)
-  const fakeStudents = gradebleStudents.filter(student => student.fake_student)
+
+  const fakeStudents = await canvasApi.requestUrl(`courses/${canvasCourseId}/assignments/gradeable_students?assignment_ids[]=${assignmentIds[0]}`)
+  .filter(student => student.fake_student)
+
   return function (student) {
-    log.info('fake students', fakeStudents)
-    log.info('student', student)
     return fakeStudents.find(fake => fake.id === student.user_id)
   }
 }
@@ -167,14 +166,13 @@ async function exportResults3 (req, res) {
       fetchedSections[student.section_id] = section
 
       // Instead of embedding users into the massive submissions response, do another query to get user data
-      // const canvasUser = await canvasApi.requestUrl(`users/${student.user_id}`)
-      // log.info('canvasUser:', canvasUser)
-      const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds, section})
+      const canvasUser = await canvasApi.requestUrl(`users/${student.user_id}`)
+      log.info('canvasUser:', canvasUser)
+      const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds, section, canvasUser})
       res.write(csv.createLine(csvLine))
     }
     res.send()
     await ldapClient.unbind()
-    
   } catch (e) {
     log.error(`Export failed for query ${req.query}:`, e)
     res.status(500).send(`
