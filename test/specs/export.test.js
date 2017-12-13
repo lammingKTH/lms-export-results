@@ -17,9 +17,12 @@ class CanvasApi {
 
 const _export = proxyquire('../../server/export', {
   'kth-canvas-api': CanvasApi,
-  './ldap': {getBoundClient () {
+  './ldap': {
+    getBoundClient () {
     console.log('mocking ldap client')
-    return {}
+    return {
+      unbind(){}
+    }
   }}
 })
 const exportResults = _export.__get__('exportResults')

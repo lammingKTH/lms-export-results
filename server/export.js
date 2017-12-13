@@ -173,6 +173,8 @@ async function exportResults3 (req, res) {
       res.write(csv.createLine(csvLine))
     }
     res.send()
+    await ldapClient.unbind()
+    
   } catch (e) {
     log.error(`Export failed for query ${req.query}:`, e)
     res.status(500).send(`
