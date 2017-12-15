@@ -150,14 +150,9 @@ async function exportResults3 (req, res) {
 
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
-    console.log('assignmentIds, headers', assignmentIds, headers)
-    console.log('mapped, ', assignmentIds.map(id => headers[id]))
-    csvHeader.concat(assignmentIds.map(id => headers[id]))
+    const allHeaders = csvHeader.concat(assignmentIds.map(id => headers[id]))
 
-    console.log('csvHeader', csvHeader)
-    console.log('line', csv.createLine(csvHeader))
-
-    res.write(csv.createLine(csvHeader))
+    res.write(csv.createLine(allHeaders))
 
 
 
