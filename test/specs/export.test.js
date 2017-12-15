@@ -53,7 +53,7 @@ test('should send status:500 if exportResults breaks', t => {
   t.end()
 })
 
-test.only(`should write a file
+test(`should write a file
     with BOM and headlines
     if there's no assignments in the course`, async t => {
   const res = {

@@ -61,7 +61,6 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds, sectio
   let row
   try {
     const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
-    // const ugUser = {givenName: 'mock', sn: 'Mock', norEduPersonNIN: '12121212'}
     row = {
       kthid: student.sis_user_id,
       givenName: ugUser.givenName,
@@ -87,7 +86,7 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds, sectio
     (canvasUser && canvasUser.login_id) || ''
   ].concat(assignmentIds.map(id => row[id] || '-'))
 }
-//
+
 function exportResults2 (req, res) {
   try {
     // Hack to make Canvas see that the auth is finished and the
@@ -178,7 +177,6 @@ async function exportResults3 (req, res) {
     res.status(500).send(`
       <html>
       <head>
-      <link rel="stylesheet" href="todo:add correct url here" type="text/css" media="all">
       </head>
       <div class="error-message alert" role="alert">
                <span class="message">
