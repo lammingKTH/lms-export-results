@@ -85,7 +85,7 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds, sectio
     row.givenName || '',
     row.surname || '',
     `="${row.personnummer || ''}"`,
-    canvasUser.login_id || ''
+    (canvasUser && canvasUser.login_id) || ''
   ].concat(assignmentIds.map(id => row[id] || '-'))
 }
 //
