@@ -111,24 +111,32 @@ function exportDone (req, res) {
 }
 
 async function curriedIsFake ({canvasApi, canvasCourseId, assignmentIds}) {
-  // Get a list of the gradeble students for the first assignment.
-  // The only reason for this is to get the fake_student info for the students
-
-  const fakeStudents = await canvasApi.requestUrl(`courses/${canvasCourseId}/assignments/gradeable_students?assignment_ids[]=${assignmentIds[0]}`)
-  .filter(student => student.fake_student)
+  const users = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
 
   return function (student) {
-    return fakeStudents.find(fake => fake.id === student.user_id)
+    return !users.find(user => user.id === student.user_id)
   }
 }
 
 async function exportResults3 (req, res) {
   try {
+
     const fetchedSections = {}
 
     const courseRound = req.query.courseRound
     const canvasCourseId = req.query.canvasCourseId
     log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
+
+    // Start writing response as soon as possible
+    res.set({
+      'content-type': 'text/csv; charset=utf-8',
+      'location': 'http://www.kth.se'
+    })
+    res.attachment(`${courseRound || 'canvas'}-results.csv`)
+
+    // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
+    res.write('\uFEFF')
+
     const ldapClient = await ldap.getBoundClient()
 
     const accessToken = await getAccessToken({
@@ -139,21 +147,22 @@ async function exportResults3 (req, res) {
     })
 
     const canvasApi = new CanvasApi(canvasApiUrl, accessToken)
-    const students = await canvasApi.requestUrl(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
 
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
+    console.log('assignmentIds, headers', assignmentIds, headers)
+    console.log('mapped, ', assignmentIds.map(id => headers[id]))
     csvHeader.concat(assignmentIds.map(id => headers[id]))
 
-    res.set({
-      'content-type': 'text/csv; charset=utf-8',
-      'location': 'http://www.kth.se'
-    })
-    res.attachment(`${courseRound || 'canvas'}-results.csv`)
+    console.log('csvHeader', csvHeader)
+    console.log('line', csv.createLine(csvHeader))
 
-    // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
-    res.write('\uFEFF')
     res.write(csv.createLine(csvHeader))
+
+
+
+    const students = await canvasApi.requestUrl(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
+
 
     const isFake = await curriedIsFake({canvasApi, canvasCourseId, assignmentIds})
     for (let student of students) {
@@ -165,11 +174,8 @@ async function exportResults3 (req, res) {
 
       // Instead of embedding users into the massive submissions response, do another query to get user data
       let canvasUser
-      try{
-        canvasUser = await canvasApi.requestUrl(`users/${student.user_id}`)
-      }catch(e){
-        log.error('An error occured while getting user from canvas', e)
-      }
+
+      canvasUser = await canvasApi.requestUrl(`users/${student.user_id}`)
 
       const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds, section, canvasUser})
       res.write(csv.createLine(csvLine))
