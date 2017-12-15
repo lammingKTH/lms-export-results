@@ -62,7 +62,6 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds, sectio
   let row
   try {
     const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
-    console.log('ugUser:', ugUser)
     // const ugUser = {givenName: 'mock', sn: 'Mock', norEduPersonNIN: '12121212'}
     row = {
       kthid: student.sis_user_id,
@@ -161,13 +160,17 @@ async function exportResults3 (req, res) {
       if (isFake(student)) {
         continue
       }
-      console.log('fetch section...')
       const section = fetchedSections[student.section_id] || await canvasApi.requestCanvas(`sections/${student.section_id}`)
       fetchedSections[student.section_id] = section
 
       // Instead of embedding users into the massive submissions response, do another query to get user data
-      const canvasUser = await canvasApi.requestUrl(`users/${student.user_id}`)
-      log.info('canvasUser:', canvasUser)
+      let canvasUser
+      try{
+        canvasUser = await canvasApi.requestUrl(`users/${student.user_id}`)
+      }catch(e){
+        log.error('An error occured while getting user from canvas', e)
+      }
+
       const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds, section, canvasUser})
       res.write(csv.createLine(csvLine))
     }
