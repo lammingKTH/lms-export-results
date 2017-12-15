@@ -8,7 +8,6 @@ const csv = require('./csvFile')
 const ldap = require('./ldap')
 
 const canvasApiUrl = `https://${settings.canvas.host}/api/v1`
-const csvHeader = ['SIS User ID', 'ID', 'Section', 'Name', 'Surname', 'Personnummer', 'Email address']
 
 function exportResults (req, res) {
   try {
@@ -150,14 +149,11 @@ async function exportResults3 (req, res) {
 
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
-    const allHeaders = csvHeader.concat(assignmentIds.map(id => headers[id]))
+    const csvHeader = ['SIS User ID', 'ID', 'Section', 'Name', 'Surname', 'Personnummer', 'Email address'].concat(assignmentIds.map(id => headers[id]))
 
-    res.write(csv.createLine(allHeaders))
-
-
+    res.write(csv.createLine(csvHeader))
 
     const students = await canvasApi.requestUrl(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
-
 
     const isFake = await curriedIsFake({canvasApi, canvasCourseId, assignmentIds})
     for (let student of students) {
