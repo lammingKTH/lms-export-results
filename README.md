@@ -24,6 +24,7 @@ LDAP_USERNAME
 LDAP_PASSWORD
 (PROXY_BASE if the protocol and host that the app sees does not match what the user should see)
 
+
 ### Setup canvas
 
 #### Add an external tool
