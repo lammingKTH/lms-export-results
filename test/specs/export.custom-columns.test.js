@@ -35,8 +35,8 @@ test.only('should return a function with user_id as argument, and the column dat
   canvasApi.recursePages.withArgs(`/courses/${canvasCourseId}/custom_gradebook_columns/${columnId}/data`).returns(
     [
       {
-        'content': 'en anteckning...',
-        'user_id': userId
+        content: 'en anteckning...',
+        user_id: userId
       }
     ]
   )
@@ -44,8 +44,8 @@ test.only('should return a function with user_id as argument, and the column dat
   canvasApi.recursePages.withArgs(`/courses/${canvasCourseId}/custom_gradebook_columns/${columnId2}/data`).returns(
     [
       {
-        'content': 'Nåt annat data i en kolumn',
-        'user_id': userId
+        content: 'Nåt annat data i en kolumn',
+        user_id: userId
       }
     ]
   )
@@ -54,8 +54,8 @@ test.only('should return a function with user_id as argument, and the column dat
   const result = getCustomColumns(userId)
   const result2 = getCustomColumns('not existing')
   const expected = {
-    columnId: 'en anteckning...',
-    columnId2: 'Nåt annat data i en kolumn'
+    [columnId]: 'en anteckning...',
+    [columnId2]: 'Nåt annat data i en kolumn'
   }
   t.deepEqual(result, expected)
 
