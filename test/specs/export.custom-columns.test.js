@@ -1,52 +1,65 @@
 const test = require('tape')
-const rewire = require('rewire')
 const sinon = require('sinon')
 require('rewire-global').enable()
-const proxyquire = require('proxyquire')
-
-// class CanvasApi {
-//   requestUrl (url) {
-//     console.log('>>>>>>>> Mocking requestUrl <<<<<<<<', url)
-//     return []
-//   }
-//   recursePages () {
-//     console.log('>>>>>>>> Mocking recursePages <<<<<<<<')
-//     return []
-//   }
-// }
 
 const _export = require('../../server/export')
 
 const getCustomColumnsFn = _export.__get__('getCustomColumnsFn')
 
-test.only('should order the data for custom columns as {sis_user_id:[{customColumnData}]}', async t => {
-  const sisUserId = 1
-  const canvasCourseId = 1
+test.only('should return a function with user_id as argument, and the column data as return value', async t => {
+  const userId = 123456
+  const canvasCourseId = 0
   const canvasApi = {recursePages: sinon.stub()}
   const canvasApiUrl = ''
   const columnId = 1
-  canvasApi.recursePages.withArgs('/courses/1/custom_gradebook_columns').returns([
+  const columnId2 = 2
+
+  // Columns
+  canvasApi.recursePages.withArgs(`/courses/${canvasCourseId}/custom_gradebook_columns`).returns([
     {
-      'id': columnId,
-      'title': 'Anteckningar',
-      'position': 1,
-      'teacher_notes': true,
-      'hidden': false
+      id: columnId,
+      title: 'Anteckningar',
+      position: 1,
+      teacher_notes: true,
+      hidden: false
+    }, {
+      id: columnId2,
+      title: 'Nån annan kolumn',
+      position: 2,
+      teacher_notes: false,
+      hidden: false
     }
   ])
 
+  // Column data
   canvasApi.recursePages.withArgs(`/courses/${canvasCourseId}/custom_gradebook_columns/${columnId}/data`).returns(
     [
       {
         'content': 'en anteckning...',
-        'user_id': 8398
+        'user_id': userId
+      }
+    ]
+  )
+
+  canvasApi.recursePages.withArgs(`/courses/${canvasCourseId}/custom_gradebook_columns/${columnId2}/data`).returns(
+    [
+      {
+        'content': 'Nåt annat data i en kolumn',
+        'user_id': userId
       }
     ]
   )
 
   const getCustomColumns = await getCustomColumnsFn({canvasApi, canvasCourseId, canvasApiUrl})
-  const result = getCustomColumns(sisUserId)
+  const result = getCustomColumns(userId)
+  const result2 = getCustomColumns('not existing')
+  const expected = {
+    columnId: 'en anteckning...',
+    columnId2: 'Nåt annat data i en kolumn'
+  }
+  t.deepEqual(result, expected)
 
-  t.deepEqual(result, { '1': [ { content: 'en anteckning...', user_id: 8398 } ] })
+  // Also verify that
+  t.deepEqual(result2, undefined)
   t.end()
 })

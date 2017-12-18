@@ -117,12 +117,12 @@ async function curriedIsFake ({usersInCourse}) {
 
 async function getCustomColumnsFn ({canvasApi, canvasCourseId, canvasApiUrl}) {
   const customColumnsData = {}
+  console.log('`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns`', `${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns`)
   const customColumns = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns`)
-  console.log('customColumns', customColumns)
+  console.log(customColumns)
   for (let customColumn of customColumns) {
     customColumnsData[customColumn.id] = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns/${customColumn.id}/data`)
   }
-  console.log('columnsData:', customColumnsData)
   return function getCustomColumns() {
     return customColumnsData
   }
