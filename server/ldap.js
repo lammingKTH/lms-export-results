@@ -58,10 +58,7 @@ function lookupUser (ldapClient, kthid) {
           let user
           res.on('searchEntry', ({object}) => { user = object })
           res.on('end', () => resolve(user || {}))
-          res.on('error', (e) => {
-            console.log('error', e)
-            reject(e)
-          })
+          res.on('error', reject)
         }
       }
     )
