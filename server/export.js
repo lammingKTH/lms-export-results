@@ -57,7 +57,8 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
   return {assignmentIds, headers}
 }
 
-async function createSubmissionLine ({student, ldapClient, assignmentIds, section, canvasUser}) {
+async function createSubmissionLine ({student, ldapClient, assignmentIds, section, canvasUser, customColumns}) {
+  const customColumns = await canvasApi.recursePages()
   let row
   try {
     const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
@@ -109,15 +110,26 @@ function exportDone (req, res) {
 }
 
 async function curriedIsFake ({usersInCourse}) {
-
   return function (student) {
     return !usersInCourse.find(user => user.id === student.user_id)
   }
 }
 
+async function getCustomColumnsFn ({canvasApi, canvasCourseId, canvasApiUrl}) {
+  const customColumnsData = {}
+  const customColumns = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns`)
+  console.log('customColumns', customColumns)
+  for (let customColumn of customColumns) {
+    customColumnsData[customColumn.id] = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns/${customColumn.id}/data`)
+  }
+  console.log('columnsData:', customColumnsData)
+  return function getCustomColumns() {
+    return customColumnsData
+  }
+}
+
 async function exportResults3 (req, res) {
   try {
-
     const fetchedSections = {}
 
     const courseRound = req.query.courseRound
@@ -156,6 +168,7 @@ async function exportResults3 (req, res) {
     const usersInCourse = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
 
     const isFake = await curriedIsFake({usersInCourse})
+    const getCustomColumns = await getCustomColumnsFn({canvasApi, canvasCourseId})
 
     for (let student of students) {
       if (isFake(student)) {
@@ -165,7 +178,9 @@ async function exportResults3 (req, res) {
       fetchedSections[student.section_id] = section
 
       const canvasUser = usersInCourse.find(user => user.sis_user_id === student.sis_user_id)
-      const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds, section, canvasUser})
+      const customColumns = getCustomColumns(student.sis_user_id)
+      const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds, section, canvasUser, customColumns})
+
       res.write(csv.createLine(csvLine))
     }
     res.send()
