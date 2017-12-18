@@ -84,9 +84,6 @@ async function createFixedColumnsContent({student, ldapClient, section, canvasUs
   ]
 }
 
-async function createCustomColumnsContent({customColumns, customColumnsData}) {
-  return ['en anteckning...']
-}
 
 async function createSubmissionLineContent({student, assignmentIds}) {
   const row = {}
@@ -98,10 +95,13 @@ async function createSubmissionLineContent({student, assignmentIds}) {
 
 async function createCsvLineContent ({student, ldapClient, assignmentIds, section, canvasUser, customColumns, customColumnsData}) {
   const fixedColumnsContent = await createFixedColumnsContent({student, ldapClient, assignmentIds, section, canvasUser})
-  const customColumnsContent = await createCustomColumnsContent({customColumns, customColumnsData})
   const assignmentsColumnsContent = await createSubmissionLineContent({student, ldapClient, assignmentIds, section, canvasUser})
 
-  return [...fixedColumnsContent, ...customColumnsContent, ...assignmentsColumnsContent]
+  return [
+    ...fixedColumnsContent,
+    ...customColumnsData,
+    ...assignmentsColumnsContent
+  ]
 }
 
 function exportResults2 (req, res) {
