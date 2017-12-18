@@ -98,8 +98,8 @@ async function createSubmissionLineContent({student, assignmentIds}) {
 
 async function createCsvLineContent ({student, ldapClient, assignmentIds, section, canvasUser, customColumns, customColumnsData}) {
   const fixedColumnsContent = await createFixedColumnsContent({student, ldapClient, assignmentIds, section, canvasUser})
-  const assignmentsColumnsContent = await createSubmissionLineContent({student, ldapClient, assignmentIds, section, canvasUser})
   const customColumnsContent = await createCustomColumnsContent({customColumns, customColumnsData})
+  const assignmentsColumnsContent = await createSubmissionLineContent({student, ldapClient, assignmentIds, section, canvasUser})
 
   return [...fixedColumnsContent, ...customColumnsContent, ...assignmentsColumnsContent]
 }
@@ -183,17 +183,21 @@ async function exportResults3 (req, res) {
 
     const {getCustomColumnsData, customColumns} = await getCustomColumnsFn({canvasApi, canvasCourseId, canvasApiUrl})
 
-    const csvHeader = [
+    const fixedColumnHeaders = [
       'SIS User ID',
       'ID',
       'Section',
       'Name',
       'Surname',
       'Personnummer',
-      'Email address',
-      ...customColumns.map(c => c.title)
+      'Email address']
+
+    // Note that the order of these columns has to match that returned from the 'createCsvLineContent' function
+    const csvHeader = [
+      ...fixedColumnHeaders,
+      ...customColumns.map(c => c.title),
+      ...assignmentIds.map(id => headers[id])
     ]
-    .concat(assignmentIds.map(id => headers[id]))
 
     res.write(csv.createLine(csvHeader))
 
