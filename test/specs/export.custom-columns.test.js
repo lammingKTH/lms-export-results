@@ -50,8 +50,8 @@ test.only('should return a function with user_id as argument, and the column dat
     ]
   )
 
-  const getCustomColumns = await getCustomColumnsFn({canvasApi, canvasCourseId, canvasApiUrl})
-  const result = getCustomColumns(userId)
+  const {getCustomColumnsData} = await getCustomColumnsFn({canvasApi, canvasCourseId, canvasApiUrl})
+  const result = getCustomColumnsData(userId)
   const expected = {
     [columnId]: 'en anteckning...',
     [columnId2]: 'Nåt annat data i en kolumn'

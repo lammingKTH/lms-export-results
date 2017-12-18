@@ -57,8 +57,7 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
   return {assignmentIds, headers}
 }
 
-async function createSubmissionLine ({student, ldapClient, assignmentIds, section, canvasUser, customColumns}) {
-  const customColumns = await canvasApi.recursePages()
+async function createFixedColumnsContent({student, ldapClient, section, canvasUser, customColumns, customColumnsData}) {
   let row
   try {
     const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
@@ -74,9 +73,6 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds, sectio
     row = {}
   }
 
-  for (let submission of student.submissions) {
-    row['' + submission.assignment_id] = submission.entered_grade || ''
-  }
   return [
     student.sis_user_id || '',
     student.user_id || '',
@@ -85,7 +81,27 @@ async function createSubmissionLine ({student, ldapClient, assignmentIds, sectio
     row.surname || '',
     `="${row.personnummer || ''}"`,
     (canvasUser && canvasUser.login_id) || ''
-  ].concat(assignmentIds.map(id => row[id] || '-'))
+  ]
+}
+
+async function createCustomColumnsContent({customColumns, customColumnsData}) {
+  return ['en anteckning...']
+}
+
+async function createSubmissionLineContent({student, assignmentIds}) {
+  const row = {}
+  for (let submission of student.submissions) {
+    row['' + submission.assignment_id] = submission.entered_grade || ''
+  }
+  return assignmentIds.map(id => row[id] || '-')
+}
+
+async function createCsvLineContent ({student, ldapClient, assignmentIds, section, canvasUser, customColumns, customColumnsData}) {
+  const fixedColumnsContent = await createFixedColumnsContent({student, ldapClient, assignmentIds, section, canvasUser})
+  const assignmentsColumnsContent = await createSubmissionLineContent({student, ldapClient, assignmentIds, section, canvasUser})
+  const customColumnsContent = await createCustomColumnsContent({customColumns, customColumnsData})
+
+  return [...fixedColumnsContent, ...customColumnsContent, ...assignmentsColumnsContent]
 }
 
 function exportResults2 (req, res) {
@@ -125,8 +141,11 @@ async function getCustomColumnsFn ({canvasApi, canvasCourseId, canvasApiUrl}) {
       customColumnsData[dataEntry.user_id][customColumn.id] = dataEntry.content
     }
   }
-  return function getCustomColumns(userId) {
-    return customColumnsData[userId]
+  return {
+    customColumns,
+    getCustomColumnsData (userId) {
+      return customColumnsData[userId]
+    }
   }
 }
 
@@ -161,7 +180,20 @@ async function exportResults3 (req, res) {
 
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
-    const csvHeader = ['SIS User ID', 'ID', 'Section', 'Name', 'Surname', 'Personnummer', 'Email address'].concat(assignmentIds.map(id => headers[id]))
+
+    const {getCustomColumnsData, customColumns} = await getCustomColumnsFn({canvasApi, canvasCourseId, canvasApiUrl})
+
+    const csvHeader = [
+      'SIS User ID',
+      'ID',
+      'Section',
+      'Name',
+      'Surname',
+      'Personnummer',
+      'Email address',
+      ...customColumns.map(c => c.title)
+    ]
+    .concat(assignmentIds.map(id => headers[id]))
 
     res.write(csv.createLine(csvHeader))
 
@@ -170,7 +202,6 @@ async function exportResults3 (req, res) {
     const usersInCourse = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
 
     const isFake = await curriedIsFake({usersInCourse})
-    const getCustomColumns = await getCustomColumnsFn({canvasApi, canvasCourseId})
 
     for (let student of students) {
       if (isFake(student)) {
@@ -180,8 +211,8 @@ async function exportResults3 (req, res) {
       fetchedSections[student.section_id] = section
 
       const canvasUser = usersInCourse.find(user => user.sis_user_id === student.sis_user_id)
-      const customColumns = getCustomColumns(student.sis_user_id)
-      const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds, section, canvasUser, customColumns})
+      const customColumnsData = getCustomColumnsData(student.sis_user_id)
+      const csvLine = await createCsvLineContent({student, ldapClient, assignmentIds, section, canvasUser, customColumns, customColumnsData})
 
       res.write(csv.createLine(csvLine))
     }
