@@ -57,7 +57,7 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
   return {assignmentIds, headers}
 }
 
-async function createFixedColumnsContent({student, ldapClient, section, canvasUser, customColumns, customColumnsData}) {
+async function createFixedColumnsContent ({student, ldapClient, section, canvasUser, customColumns, customColumnsData}) {
   let row
   try {
     const ugUser = await ldap.lookupUser(ldapClient, student.sis_user_id)
@@ -84,8 +84,7 @@ async function createFixedColumnsContent({student, ldapClient, section, canvasUs
   ]
 }
 
-
-async function createSubmissionLineContent({student, assignmentIds}) {
+async function createSubmissionLineContent ({student, assignmentIds}) {
   const row = {}
   for (let submission of student.submissions) {
     row['' + submission.assignment_id] = submission.entered_grade || ''
@@ -131,23 +130,23 @@ async function curriedIsFake ({usersInCourse}) {
   }
 }
 
-async function getCustomColumnsFn ({canvasApi, canvasCourseId, canvasApiUrl}) {
-  const customColumnsData = {}
-  const customColumns = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns`)
-  for (let customColumn of customColumns) {
-    const data = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns/${customColumn.id}/data`)
-    for (let dataEntry of data) {
-      customColumnsData[dataEntry.user_id] = customColumnsData[dataEntry.user_id] || {}
-      customColumnsData[dataEntry.user_id][customColumn.id] = dataEntry.content
-    }
-  }
-  return {
-    customColumns,
-    getCustomColumnsData (userId) {
-      return customColumnsData[userId]
-    }
-  }
-}
+// async function getCustomColumnsFn ({canvasApi, canvasCourseId, canvasApiUrl}) {
+//   const customColumnsData = {}
+//   const customColumns = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns`)
+//   for (let customColumn of customColumns) {
+//     const data = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns/${customColumn.id}/data`)
+//     for (let dataEntry of data) {
+//       customColumnsData[dataEntry.user_id] = customColumnsData[dataEntry.user_id] || {}
+//       customColumnsData[dataEntry.user_id][customColumn.id] = dataEntry.content
+//     }
+//   }
+//   return {
+//     customColumns,
+//     getCustomColumnsData (userId) {
+//       return customColumnsData[userId]
+//     }
+//   }
+// }
 
 async function exportResults3 (req, res) {
   try {
@@ -181,7 +180,7 @@ async function exportResults3 (req, res) {
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
 
-    const {getCustomColumnsData, customColumns} = await getCustomColumnsFn({canvasApi, canvasCourseId, canvasApiUrl})
+    // const {getCustomColumnsData, customColumns} = await getCustomColumnsFn({canvasApi, canvasCourseId, canvasApiUrl})
 
     const fixedColumnHeaders = [
       'SIS User ID',
@@ -198,7 +197,6 @@ async function exportResults3 (req, res) {
       // ...customColumns.map(c => c.title),
       ...assignmentIds.map(id => headers[id])
     ]
-
 
     res.write(csv.createLine(csvHeader))
 
@@ -217,7 +215,7 @@ async function exportResults3 (req, res) {
 
       const canvasUser = usersInCourse.find(user => user.sis_user_id === student.sis_user_id)
       // const customColumnsData = getCustomColumnsData(student.sis_user_id)
-      const csvLine = await createCsvLineContent({student, ldapClient, assignmentIds, section, canvasUser, customColumns})
+      const csvLine = await createCsvLineContent({student, ldapClient, assignmentIds, section, canvasUser})
       // const csvLine = await createCsvLineContent({student, ldapClient, assignmentIds, section, canvasUser, customColumns, customColumnsData})
 
       res.write(csv.createLine(csvLine))
