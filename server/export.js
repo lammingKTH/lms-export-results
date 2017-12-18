@@ -199,6 +199,7 @@ async function exportResults3 (req, res) {
       ...assignmentIds.map(id => headers[id])
     ]
 
+
     res.write(csv.createLine(csvHeader))
 
     const students = await canvasApi.requestUrl(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
