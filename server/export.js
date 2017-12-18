@@ -108,11 +108,10 @@ function exportDone (req, res) {
   res.send('Done. The file should now be downloaded to your computer.')
 }
 
-async function curriedIsFake ({canvasApi, canvasCourseId, assignmentIds}) {
-  const users = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
+async function curriedIsFake ({usersInCourse}) {
 
   return function (student) {
-    return !users.find(user => user.id === student.user_id)
+    return !usersInCourse.find(user => user.id === student.user_id)
   }
 }
 
@@ -154,7 +153,10 @@ async function exportResults3 (req, res) {
 
     const students = await canvasApi.requestUrl(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
 
-    const isFake = await curriedIsFake({canvasApi, canvasCourseId, assignmentIds})
+    const usersInCourse = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
+
+    const isFake = await curriedIsFake({usersInCourse})
+
     for (let student of students) {
       if (isFake(student)) {
         continue
@@ -162,11 +164,7 @@ async function exportResults3 (req, res) {
       const section = fetchedSections[student.section_id] || await canvasApi.requestCanvas(`sections/${student.section_id}`)
       fetchedSections[student.section_id] = section
 
-      // Instead of embedding users into the massive submissions response, do another query to get user data
-      let canvasUser
-
-      canvasUser = await canvasApi.requestUrl(`users/${student.user_id}`)
-
+      const canvasUser = usersInCourse.find(user => user.sis_user_id === student.sis_user_id)
       const csvLine = await createSubmissionLine({student, ldapClient, assignmentIds, section, canvasUser})
       res.write(csv.createLine(csvLine))
     }
