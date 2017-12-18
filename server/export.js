@@ -99,7 +99,7 @@ async function createCsvLineContent ({student, ldapClient, assignmentIds, sectio
 
   return [
     ...fixedColumnsContent,
-    ...customColumnsData,
+    // ...customColumnsData,
     ...assignmentsColumnsContent
   ]
 }
@@ -195,7 +195,7 @@ async function exportResults3 (req, res) {
     // Note that the order of these columns has to match that returned from the 'createCsvLineContent' function
     const csvHeader = [
       ...fixedColumnHeaders,
-      ...customColumns.map(c => c.title),
+      // ...customColumns.map(c => c.title),
       ...assignmentIds.map(id => headers[id])
     ]
 
@@ -216,8 +216,9 @@ async function exportResults3 (req, res) {
       fetchedSections[student.section_id] = section
 
       const canvasUser = usersInCourse.find(user => user.sis_user_id === student.sis_user_id)
-      const customColumnsData = getCustomColumnsData(student.sis_user_id)
-      const csvLine = await createCsvLineContent({student, ldapClient, assignmentIds, section, canvasUser, customColumns, customColumnsData})
+      // const customColumnsData = getCustomColumnsData(student.sis_user_id)
+      const csvLine = await createCsvLineContent({student, ldapClient, assignmentIds, section, canvasUser, customColumns})
+      // const csvLine = await createCsvLineContent({student, ldapClient, assignmentIds, section, canvasUser, customColumns, customColumnsData})
 
       res.write(csv.createLine(csvLine))
     }

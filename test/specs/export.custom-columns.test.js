@@ -60,7 +60,7 @@ test('should return a function with user_id as argument, and the column data as 
   t.end()
 })
 
-test.only(`should return a function with user_id as argument,
+test.skip(`should return a function with user_id as argument,
   and an empty string for each custom column
   if the user has no data for the custom columns
   `, async t => {
