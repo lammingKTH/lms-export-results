@@ -5,7 +5,7 @@ require('rewire-global').enable()
 const _export = require('../../server/export')
 
 // const getCustomColumnsFn = _export.__get__('getCustomColumnsFn')
-
+//
 test.skip('should return a function with user_id as argument, and the column data as return value', async t => {
   const userId = 123456
   const canvasCourseId = 0
