@@ -168,6 +168,8 @@ async function exportResults3 (req, res) {
 
     const ldapClient = await ldap.getBoundClient()
 
+    log.info('about to get access token using client id:', settings.canvas.clientId)
+
     const accessToken = await getAccessToken({
       clientId: settings.canvas.clientId,
       clientSecret: settings.canvas.clientSecret,
