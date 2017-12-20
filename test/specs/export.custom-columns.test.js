@@ -60,15 +60,15 @@ test('should return a function with user_id as argument, and the column data as 
   t.end()
 })
 
-test.skip(`should return a function with user_id as argument,
-  and an empty string for each custom column
+test(`should return a function with user_id as argument,
+  and an object as result
   if the user has no data for the custom columns
   `, async t => {
   const userId = 123, userId2 = 456
   const canvasCourseId = 0
   const canvasApi = {recursePages: sinon.stub()}
   const canvasApiUrl = ''
-  const columnId = 1, columnId2 = 2
+  const columnId = 1
 
   // Columns
   canvasApi.recursePages.withArgs(`/courses/${canvasCourseId}/custom_gradebook_columns`).returns([
@@ -83,20 +83,12 @@ test.skip(`should return a function with user_id as argument,
 
   // Column data
   canvasApi.recursePages.withArgs(`/courses/${canvasCourseId}/custom_gradebook_columns/${columnId}/data`).returns(
-    [
-      {
-        content: 'en anteckning...',
-        user_id: userId
-      }
-    ]
+    []
   )
 
   const {getCustomColumnsData} = await getCustomColumnsFn({canvasApi, canvasCourseId, canvasApiUrl})
   const result = getCustomColumnsData(userId2)
-  const expected = {
-    [columnId]: '',
-    [columnId2]: ''
-  }
+  const expected = {}
   t.deepEqual(result, expected)
   t.end()
 })

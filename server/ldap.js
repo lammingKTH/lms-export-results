@@ -7,10 +7,8 @@ function getBoundClient () {
       url: settings.ldap.url,
       timeout: 1000,
       connectTimeout: 2000,
-      log: log
+      log
     }
-    // const username = process.env.LDAP_USERNAME
-    // const password = process.env.LDAP_PASSWORD
 
     const username = settings.ldap.userName
     const password = settings.ldap.password
