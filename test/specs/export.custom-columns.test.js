@@ -61,7 +61,7 @@ test('should return a function with user_id as argument, and the column data as 
   t.end()
 })
 
-test.only(`should sort the custom column headers by position`, t => {
+test(`should sort the custom column headers by position`, t => {
   const customColumns = [
     {
       id: 185,

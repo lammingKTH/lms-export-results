@@ -155,7 +155,7 @@ async function getCustomColumnsFn ({canvasApi, canvasCourseId, canvasApiUrl}) {
 }
 
 function getCustomColumnHeaders(customColumns){
-  return customColumns.map(c => c.title)
+  return  _.orderBy(customColumns, ['position'], ['asc']).map(c => c.title)
 }
 
 async function exportResults3 (req, res) {
