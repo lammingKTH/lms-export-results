@@ -61,11 +61,28 @@ test('should return a function with user_id as argument, and the column data as 
   t.end()
 })
 
-test(`should sort the custom columns by position`, t => {
-  assert.fail()
+test.only(`should sort the custom column headers by position`, t => {
+  const customColumns = [
+    {
+      id: 185,
+      title: 'Anteckningar 2',
+      position: 2,
+      teacher_notes: true,
+      hidden: false
+    }, {
+      id: 184,
+      title: 'Anteckningar',
+      position: 1,
+      teacher_notes: true,
+      hidden: false
+    }]
+  const getCustomColumnHeaders = _export.__get__('getCustomColumnHeaders')
+  const result = getCustomColumnHeaders(customColumns)
+  result.should.deepEqual(['Anteckningar', 'Anteckningar 2'])
+  t.end()
 })
 
-test.only(`should return an array with the custom columns data,
+test(`should return an array with the custom columns data,
   or empty string if no data exists,
   sorted by custom columns position`, t => {
   const customColumnsData = {184: 'en anteckning...'}

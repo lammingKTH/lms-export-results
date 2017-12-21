@@ -154,6 +154,10 @@ async function getCustomColumnsFn ({canvasApi, canvasCourseId, canvasApiUrl}) {
   }
 }
 
+function getCustomColumnHeaders(customColumns){
+  return customColumns.map(c => c.title)
+}
+
 async function exportResults3 (req, res) {
   try {
     const fetchedSections = {}
@@ -200,7 +204,7 @@ async function exportResults3 (req, res) {
     // Note that the order of these columns has to match that returned from the 'createCsvLineContent' function
     const csvHeader = [
       ...fixedColumnHeaders,
-      ...customColumns.map(c => c.title),
+      ...getCustomColumnHeaders(customColumns),
       ...assignmentIds.map(id => headers[id])
     ]
 
