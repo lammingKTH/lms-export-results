@@ -1,7 +1,7 @@
 const test = require('tape')
 const sinon = require('sinon')
 require('rewire-global').enable()
-
+const assert = require('assert')
 const _export = require('../../server/export')
 
 const getCustomColumnsFn = _export.__get__('getCustomColumnsFn')
@@ -58,6 +58,21 @@ test('should return a function with user_id as argument, and the column data as 
   }
   t.deepEqual(result, expected)
   t.end()
+})
+
+test.only(`should... `, t => {
+  const customColumnsData = {184: 'en anteckning...'}
+  const customColumns = [
+    {
+      id: 184,
+      title: 'Anteckningar',
+      position: 1,
+      teacher_notes: true,
+      hidden: false
+    }]
+  const createCustomColumnsContent = _export.__get__('createCustomColumnsContent')
+  const result = createCustomColumnsContent({customColumns, customColumnsData})
+  assert.deepEqual(result, ['en anteckning...'])
 })
 
 test(`should return a function with user_id as argument,

@@ -84,8 +84,9 @@ async function createFixedColumnsContent ({student, ldapClient, section, canvasU
   ]
 }
 
-async function createCustomColumnsContent ({customColumnsData}) {
+async function createCustomColumnsContent ({customColumnsData, customColumns}) {
   log.info('customColumnsData', customColumnsData)
+  log.info('customColumns', customColumns)
   return []
 }
 
@@ -99,7 +100,7 @@ async function createSubmissionLineContent ({student, assignmentIds}) {
 
 async function createCsvLineContent ({student, ldapClient, assignmentIds, section, canvasUser, customColumns, customColumnsData}) {
   const fixedColumnsContent = await createFixedColumnsContent({student, ldapClient, assignmentIds, section, canvasUser})
-  const customColumnsContent = await createCustomColumnsContent({customColumnsData})
+  const customColumnsContent = await createCustomColumnsContent({customColumnsData, customColumns})
   const assignmentsColumnsContent = await createSubmissionLineContent({student, ldapClient, assignmentIds, section, canvasUser})
 
   return [
@@ -220,7 +221,9 @@ async function exportResults3 (req, res) {
       fetchedSections[student.section_id] = section
 
       const canvasUser = usersInCourse.find(user => user.sis_user_id === student.sis_user_id)
-      const customColumnsData = getCustomColumnsData(student.sis_user_id)
+
+      // console.log('get custom data for user:', student)
+      const customColumnsData = getCustomColumnsData(student.user_id)
       const csvLine = await createCsvLineContent({
         student,
         ldapClient,
