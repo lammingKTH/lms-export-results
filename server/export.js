@@ -215,7 +215,7 @@ async function exportResults3 (req, res) {
     const usersInCourse = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
 
     const isFake = await curriedIsFake({usersInCourse})
-
+    debugger
     for (let student of students) {
       if (isFake(student)) {
         continue
@@ -223,9 +223,8 @@ async function exportResults3 (req, res) {
       const section = fetchedSections[student.section_id] || await canvasApi.requestCanvas(`sections/${student.section_id}`)
       fetchedSections[student.section_id] = section
 
-      const canvasUser = usersInCourse.find(user => user.sis_user_id === student.sis_user_id)
+      const canvasUser = usersInCourse.find(u => u.id === student.user_id)
 
-      // console.log('get custom data for user:', student)
       const customColumnsData = getCustomColumnsData(student.user_id)
       const csvLine = await createCsvLineContent({
         student,
