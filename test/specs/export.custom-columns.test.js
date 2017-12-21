@@ -3,6 +3,7 @@ const sinon = require('sinon')
 require('rewire-global').enable()
 const assert = require('assert')
 const _export = require('../../server/export')
+require('should')
 
 const getCustomColumnsFn = _export.__get__('getCustomColumnsFn')
 
@@ -60,10 +61,22 @@ test('should return a function with user_id as argument, and the column data as 
   t.end()
 })
 
-test.only(`should... `, t => {
+test(`should sort the custom columns by position`, t => {
+  assert.fail()
+})
+
+test.only(`should return an array with the custom columns data,
+  or empty string if no data exists,
+  sorted by custom columns position`, t => {
   const customColumnsData = {184: 'en anteckning...'}
   const customColumns = [
     {
+      id: 185,
+      title: 'Anteckningar 2',
+      position: 2,
+      teacher_notes: true,
+      hidden: false
+    }, {
       id: 184,
       title: 'Anteckningar',
       position: 1,
@@ -72,7 +85,8 @@ test.only(`should... `, t => {
     }]
   const createCustomColumnsContent = _export.__get__('createCustomColumnsContent')
   const result = createCustomColumnsContent({customColumns, customColumnsData})
-  assert.deepEqual(result, ['en anteckning...'])
+  result.should.deepEqual(['en anteckning...', ''])
+  t.end()
 })
 
 test(`should return a function with user_id as argument,

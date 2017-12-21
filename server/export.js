@@ -6,7 +6,7 @@ const settings = require('./configuration').server
 const CanvasApi = require('kth-canvas-api')
 const csv = require('./csvFile')
 const ldap = require('./ldap')
-
+const _ = require('lodash')
 const canvasApiUrl = `https://${settings.canvas.host}/api/v1`
 
 function exportResults (req, res) {
@@ -84,13 +84,12 @@ async function createFixedColumnsContent ({student, ldapClient, section, canvasU
   ]
 }
 
-async function createCustomColumnsContent ({customColumnsData, customColumns}) {
-  log.info('customColumnsData', customColumnsData)
-  log.info('customColumns', customColumns)
-  return []
+function createCustomColumnsContent ({customColumnsData, customColumns}) {
+  const sortedCustomColumns = _.orderBy(customColumns, ['position'], ['asc'])
+  return sortedCustomColumns.map(customColumn => customColumnsData[customColumn.id] || '')
 }
 
-async function createSubmissionLineContent ({student, assignmentIds}) {
+function createSubmissionLineContent ({student, assignmentIds}) {
   const row = {}
   for (let submission of student.submissions) {
     row['' + submission.assignment_id] = submission.entered_grade || ''
@@ -100,8 +99,8 @@ async function createSubmissionLineContent ({student, assignmentIds}) {
 
 async function createCsvLineContent ({student, ldapClient, assignmentIds, section, canvasUser, customColumns, customColumnsData}) {
   const fixedColumnsContent = await createFixedColumnsContent({student, ldapClient, assignmentIds, section, canvasUser})
-  const customColumnsContent = await createCustomColumnsContent({customColumnsData, customColumns})
-  const assignmentsColumnsContent = await createSubmissionLineContent({student, ldapClient, assignmentIds, section, canvasUser})
+  const customColumnsContent = createCustomColumnsContent({customColumnsData, customColumns})
+  const assignmentsColumnsContent = createSubmissionLineContent({student, ldapClient, assignmentIds, section, canvasUser})
 
   return [
     ...fixedColumnsContent,
