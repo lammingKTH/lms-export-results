@@ -130,9 +130,10 @@ function exportDone (req, res) {
   res.send('Done. The file should now be downloaded to your computer.')
 }
 
-async function curriedIsFake ({usersInCourse}) {
+async function curriedIsFake ({canvasApi, canvasApiUrl, canvasCourseId}) {
+  const fakeUsers = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users?enrollment_type[]=student_view`)
   return function (student) {
-    return !usersInCourse.find(user => user.id === student.user_id)
+    return fakeUsers.find(user => user.id === student.user_id)
   }
 }
 
@@ -214,7 +215,7 @@ async function exportResults3 (req, res) {
 
     const usersInCourse = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
 
-    const isFake = await curriedIsFake({usersInCourse})
+    const isFake = await curriedIsFake({canvasApi})
     debugger
     for (let student of students) {
       if (isFake(student)) {
