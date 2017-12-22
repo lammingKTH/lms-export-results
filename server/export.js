@@ -177,7 +177,6 @@ async function exportResults3 (req, res) {
     // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
     res.write('\uFEFF')
 
-    const ldapClient = await ldap.getBoundClient()
 
     const accessToken = await getAccessToken({
       clientId: settings.canvas.clientId,
@@ -211,12 +210,15 @@ async function exportResults3 (req, res) {
 
     res.write(csv.createLine(csvHeader))
 
+    const ldapClient = await ldap.getBoundClient()
+
     const students = await canvasApi.requestUrl(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
 
-    const usersInCourse = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users`)
+    // TODO: the following endpoint is deprecated. Change when Instructure has responded on how we should query instead.
+    const usersInCourse = await canvasApi.requestUrl(`courses/${canvasCourseId}/students`)
 
-    const isFake = await curriedIsFake({canvasApi})
-    debugger
+    const isFake = await curriedIsFake({canvasApi, canvasApiUrl, canvasCourseId})
+
     for (let student of students) {
       if (isFake(student)) {
         continue
