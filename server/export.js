@@ -161,25 +161,25 @@ function getCustomColumnHeaders(customColumns){
 
 async function exportResults3 (req, res) {
   try {
-    log.info('1')
+    // log.info('1')
     const fetchedSections = {}
-    log.info('2')
+    // log.info('2')
     const courseRound = req.query.courseRound
-    log.info('3')
+    // log.info('3')
     const canvasCourseId = req.query.canvasCourseId
-    log.info('4')
+    // log.info('4')
     log.info(`Should export for ${courseRound} / ${canvasCourseId}`)
     // Start writing response as soon as possible
     res.set({
       'content-type': 'text/csv; charset=utf-8',
       'location': 'http://www.kth.se'
     })
-    log.info('5')
+    // log.info('5')
     res.attachment(`${courseRound || 'canvas'}-results.csv`)
-    log.info('6')
+    // log.info('6')
     // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
     res.write('\uFEFF')
-    log.info('7')
+    // log.info('7')
 
     const accessToken = await getAccessToken({
       clientId: settings.canvas.clientId,
@@ -187,14 +187,14 @@ async function exportResults3 (req, res) {
       redirectUri: req.protocol + '://' + req.get('host') + req.originalUrl,
       code: req.query.code
     })
-    log.info('8')
+    // log.info('8')
     const canvasApi = new CanvasApi(canvasApiUrl, accessToken)
-    log.info('9')
+    // log.info('9')
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
-    log.info('10')
+    // log.info('10')
     const {getCustomColumnsData, customColumns} = await getCustomColumnsFn({canvasApi, canvasCourseId, canvasApiUrl})
-    log.info('11')
+    // log.info('11')
     const fixedColumnHeaders = [
       'SIS User ID',
       'ID',
@@ -203,16 +203,16 @@ async function exportResults3 (req, res) {
       'Surname',
       'Personnummer',
       'Email address']
-      log.info('12')
+      // log.info('12')
     // Note that the order of these columns has to match that returned from the 'createCsvLineContent' function
     const csvHeader = [
       ...fixedColumnHeaders,
       ...getCustomColumnHeaders(customColumns),
       ...assignmentIds.map(id => headers[id])
     ]
-    log.info('13')
+    // log.info('13')
     res.write(csv.createLine(csvHeader))
-    log.info('14')
+    // log.info('14')
     const ldapClient = await ldap.getBoundClient()
 
     const students = await canvasApi.requestUrl(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
