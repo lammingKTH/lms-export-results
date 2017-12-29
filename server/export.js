@@ -6,6 +6,7 @@ const settings = require('./configuration').server
 const CanvasApi = require('kth-canvas-api')
 const csv = require('./csvFile')
 const ldap = require('./ldap')
+const moment = require('moment')
 const _ = require('lodash')
 const canvasApiUrl = `https://${settings.canvas.host}/api/v1`
 
@@ -175,7 +176,7 @@ async function exportResults3 (req, res) {
       'location': 'http://www.kth.se'
     })
     // log.info('5')
-    res.attachment(`${courseRound || 'canvas'}-results.csv`)
+    res.attachment(`${courseRound || 'canvas'}-${moment().format("YYYYMMDD-HHMMSS")}-results.csv`)
     // log.info('6')
     // Write BOM https://sv.wikipedia.org/wiki/Byte_order_mark
     res.write('\uFEFF')
