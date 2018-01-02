@@ -33,6 +33,7 @@
     "kth-node-response": "KTH/kth-node-response.git#v1.0.0",
     "kth-node-server": "^3.0.3",
     "ldapjs": "^1.0.1",
+    "moment": "^2.20.1",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "safe-utils": "0.1.0"
