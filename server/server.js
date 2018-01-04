@@ -5,7 +5,7 @@ const config = require('./configuration').server
 const prefix = config.proxyPrefixPath.uri
 
 /* *******************************
- * ******* STYLE *******
+ * *******KTH STYLE *******
  * *******************************
  */
 const path = require('path')

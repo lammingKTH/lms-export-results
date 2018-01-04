@@ -25,7 +25,7 @@ function exportResults (req, res) {
   } catch (e) {
     log.error('Export failed:', e)
     res.status(500).send(`<link rel="stylesheet" href="/api/lms-export-results/kth-style/css/kth-bootstrap.css">
-    <div aria-live="polite" role="alert" class="alert alert-danger">Trasig</div>`)
+    <div aria-live="polite" role="alert" class="alert alert-danger">Smth has gone wrong, try it later.</div>`)
   }
 }
 
@@ -127,7 +127,7 @@ function exportResults2 (req, res) {
   } catch (e) {
     log.error('Export failed:', e)
     res.status(500).send(`<link rel="stylesheet" href="/api/lms-export-results/kth-style/css/kth-bootstrap.css">
-    <div aria-live="polite" role="alert" class="alert alert-danger">Trasig</div>`)
+    <div aria-live="polite" role="alert" class="alert alert-danger">Smth has gone wrong, try it later.</div>`)
   }
 }
 
