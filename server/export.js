@@ -24,7 +24,8 @@ function exportResults (req, res) {
     res.redirect(basicUrl)
   } catch (e) {
     log.error('Export failed:', e)
-    res.status(500).send('Trasigt')
+    res.status(500).send(`<link rel="stylesheet" href="/api/lms-export-results/kth-style/css/kth-bootstrap.css">
+    <div aria-live="polite" role="alert" class="alert alert-danger">Trasig</div>`)
   }
 }
 
@@ -115,7 +116,9 @@ function exportResults2 (req, res) {
     // Hack to make Canvas see that the auth is finished and the
     // 'please wait' text can be removed
     res.send(`
-  Your download should start automatically. If nothing happens within a few minutes, please go back and try again.
+    <link rel="stylesheet" href="/api/lms-export-results/kth-style/css/kth-bootstrap.css">
+
+    <div aria-live="polite" role="alert" class="alert alert-info">Your download should start automatically. If nothing happens within a few minutes, please go back and try again.</div>
 
   <script>
     document.location='exportResults3${req._parsedUrl.search}'
@@ -123,12 +126,14 @@ function exportResults2 (req, res) {
       `)
   } catch (e) {
     log.error('Export failed:', e)
-    res.status(500).send('Trasigt')
+    res.status(500).send(`<link rel="stylesheet" href="/api/lms-export-results/kth-style/css/kth-bootstrap.css">
+    <div aria-live="polite" role="alert" class="alert alert-danger">Trasig</div>`)
   }
 }
 
 function exportDone (req, res) {
-  res.send('Done. The file should now be downloaded to your computer.')
+  res.send(`<link rel="stylesheet" href="/api/lms-export-results/kth-style/css/kth-bootstrap.css">
+  <div aria-live="polite" role="alert" class="alert alert-success">Done. The file should now be downloaded to your computer.</div>`)
 }
 
 async function curriedIsFake ({canvasApi, canvasApiUrl, canvasCourseId}) {
@@ -252,7 +257,7 @@ async function exportResults3 (req, res) {
       <html>
       <head>
       </head>
-      <div class="error-message alert" role="alert">
+      <div class="alert alert-danger" role="alert">
                <span class="message">
                    <p>
 

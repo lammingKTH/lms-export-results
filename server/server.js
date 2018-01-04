@@ -2,10 +2,16 @@
 const server = require('kth-node-server')
 // Now read the server config etc.
 const config = require('./configuration').server
+const prefix = config.proxyPrefixPath.uri
 
-// Expose the server and paths
-// server.locals.secret = new Map()
-module.exports = server
+/* *******************************
+ * ******* STYLE *******
+ * *******************************
+ */
+const path = require('path')
+const express = require('express')
+
+server.use(prefix +'/kth-style', express.static(path.join(__dirname, '../node_modules/kth-style/dist')))
 
 /* *******************************
  * ******* REQUEST PARSING *******
@@ -24,7 +30,6 @@ server.use(cookieParser())
 
 const { exportResults, exportResults2, exportResults3, exportDone } = require('./export')
 const {monitor, about, paths, robotsTxt} = require('./controllers/systemCtrl')
-const prefix = config.proxyPrefixPath.uri
 
 server.get(prefix + '/_monitor', monitor)
 server.get(prefix + '/_about', about)
@@ -50,4 +55,6 @@ server.get(config.proxyPrefixPath.uri + '/test', (req, res) => res.send(`
 
 // Catch not found and errors
 
+// Expose the server and paths
+// server.locals.secret = new Map()
 module.exports = server
