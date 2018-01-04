@@ -33,7 +33,7 @@
     "kth-node-express-routing": "^0.3.1",
     "kth-node-response": "KTH/kth-node-response.git#v1.0.0",
     "kth-node-server": "^3.1.1",
-    "kth-style": "^2.0.0-beta.1",
+    "kth-style": "^2.0.0-beta.2",
     "ldapjs": "^1.0.1",
     "moment": "^2.20.1",
     "request": "^2.83.0",
