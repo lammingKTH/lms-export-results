@@ -46,7 +46,8 @@ server.get(prefix + '/done', exportDone)
 // Temp route
 server.get(config.proxyPrefixPath.uri + '/test', (req, res) => res.send(`
   <html>
-  TODO: Detta är bara en testsida för att kunna testa hela oath2-flödet i prod. Så fort som produktion funkar ska denna route tas bort.
+  <link rel="stylesheet" href="/api/lms-export-results/kth-style/css/kth-bootstrap.css">
+  <p>TODO: Detta är bara en testsida för att kunna testa hela oath2-flödet i prod. Så fort som produktion funkar ska denna route tas bort.</p>
   <form method="post" action="export">
     <input autofocus name="custom_canvas_course_id" value="2080"></input>
   </form>
