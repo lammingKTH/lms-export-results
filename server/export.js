@@ -265,9 +265,6 @@ async function exportResults3 (req, res) {
 }
 
 module.exports = {
-  // Do not remove the System controller!
-  // System: require('./controllers/systemCtrl'),
-
   exportResults,
   exportResults2,
   exportResults3,
