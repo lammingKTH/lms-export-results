@@ -49,7 +49,7 @@ async function getAssignmentIdsAndHeaders ({canvasApi, canvasCourseId}) {
   const assignmentIds = []
   const headers = {}
 
-  const assignments = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/assignments`)
+  const assignments = await canvasApi.get(`/courses/${canvasCourseId}/assignments`)
 
   for (let t of assignments) {
     const id = '' + t.id
@@ -137,7 +137,7 @@ function exportDone (req, res) {
 }
 
 async function curriedIsFake ({canvasApi, canvasApiUrl, canvasCourseId}) {
-  const fakeUsers = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/users?enrollment_type[]=student_view`)
+  const fakeUsers = await canvasApi.get(`/courses/${canvasCourseId}/users?enrollment_type[]=student_view`)
   return function (student) {
     return fakeUsers.find(user => user.id === student.user_id)
   }
@@ -145,9 +145,9 @@ async function curriedIsFake ({canvasApi, canvasApiUrl, canvasCourseId}) {
 
 async function getCustomColumnsFn ({canvasApi, canvasCourseId, canvasApiUrl}) {
   const customColumnsData = {}
-  const customColumns = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns`)
+  const customColumns = await canvasApi.get(`/courses/${canvasCourseId}/custom_gradebook_columns`)
   for (let customColumn of customColumns) {
-    const data = await canvasApi.recursePages(`${canvasApiUrl}/courses/${canvasCourseId}/custom_gradebook_columns/${customColumn.id}/data`)
+    const data = await canvasApi.get(`/courses/${canvasCourseId}/custom_gradebook_columns/${customColumn.id}/data`)
     for (let dataEntry of data) {
       customColumnsData[dataEntry.user_id] = customColumnsData[dataEntry.user_id] || {}
       customColumnsData[dataEntry.user_id][customColumn.id] = dataEntry.content
@@ -208,8 +208,8 @@ async function exportResults3 (req, res) {
     res.write(csv.createLine(csvHeader))
     const ldapClient = await ldap.getBoundClient()
 
-    // CanvasApi.recurse now takes a callback function as an argument, to be called after each page is fetched. Use that to start writing as soon as possible
-    const students = await canvasApi.recurse(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
+    // CanvasApi.get now takes a callback function as an argument, to be called after each page is fetched. Use that to start writing as soon as possible
+    const students = await canvasApi.get(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
 
     // TODO: the following endpoint is deprecated. Change when Instructure has responded on how we should query instead.
     const usersInCourse = await canvasApi.requestUrl(`courses/${canvasCourseId}/students`)
