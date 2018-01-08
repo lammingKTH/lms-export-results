@@ -187,6 +187,7 @@ async function exportResults3 (req, res) {
       code: req.query.code
     })
     const canvasApi = new CanvasApi(canvasApiUrl, accessToken)
+
     // So far so good, start constructing the output
     const {assignmentIds, headers} = await getAssignmentIdsAndHeaders({canvasApi, canvasCourseId})
     const {getCustomColumnsData, customColumns} = await getCustomColumnsFn({canvasApi, canvasCourseId, canvasApiUrl})
