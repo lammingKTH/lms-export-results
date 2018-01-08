@@ -221,7 +221,7 @@ async function exportResults3 (req, res) {
     // log.info('14')
     const ldapClient = await ldap.getBoundClient()
 
-    const students = await canvasApi.requestUrl(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
+    const students = await canvasApi.recurse(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
 
     // TODO: the following endpoint is deprecated. Change when Instructure has responded on how we should query instead.
     const usersInCourse = await canvasApi.requestUrl(`courses/${canvasCourseId}/students`)
