@@ -207,6 +207,7 @@ async function exportResults3 (req, res) {
     res.write(csv.createLine(csvHeader))
     const ldapClient = await ldap.getBoundClient()
 
+    // CanvasApi.recurse now takes a callback function as an argument, to be called after each page is fetched. Use that to start writing as soon as possible
     const students = await canvasApi.recurse(`courses/${canvasCourseId}/students/submissions?grouped=1&student_ids[]=all`)
 
     // TODO: the following endpoint is deprecated. Change when Instructure has responded on how we should query instead.
